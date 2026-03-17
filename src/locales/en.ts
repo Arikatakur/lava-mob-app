@@ -72,8 +72,7 @@ export const en = {
     yourPoints: 'Your Points',
     viewRewards: 'View Rewards',
     heroCoffee: 'Specialty Coffee',
-    heroCrafted: 'Crafted with
-Passion',
+    heroCrafted: 'Crafted with Passion',
     heroOrder: 'Order Now',
   },
   menu: {
