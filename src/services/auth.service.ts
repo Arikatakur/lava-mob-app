@@ -2,20 +2,17 @@ import { supabase } from './supabase';
 import type { Profile } from '../types';
 
 export const authService = {
-  async signUp(email: string, password: string, fullName: string) {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: fullName } },
-    });
+  async sendOtp(phone: string) {
+    const { data, error } = await supabase.auth.signInWithOtp({ phone });
     if (error) throw error;
     return data;
   },
 
-  async signIn(email: string, password: string) {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+  async verifyOtp(phone: string, token: string) {
+    const { data, error } = await supabase.auth.verifyOtp({
+      phone,
+      token,
+      type: 'sms',
     });
     if (error) throw error;
     return data;
@@ -47,6 +44,7 @@ export const authService = {
       .from('profiles')
       .update(updates)
       .eq('id', userId)
+      .select()
       .single();
     if (error) throw error;
     return data as Profile;

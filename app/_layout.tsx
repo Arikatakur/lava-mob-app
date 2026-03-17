@@ -8,6 +8,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { supabase } from '../src/services/supabase';
 import { useAuthStore } from '../src/store/useAuthStore';
 import { useAppStore } from '../src/store/useAppStore';
+import { useFavoritesStore } from '../src/store/useFavoritesStore';
+import { favoritesService } from '../src/services/favorites.service';
 import { Colors } from '../src/theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -15,6 +17,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const { setUser, setLoading } = useAuthStore();
   const { isRTL } = useAppStore();
+  const { setAll } = useFavoritesStore();
 
   const [fontsLoaded] = useFonts({
     Poppins_400Regular,
@@ -35,6 +38,13 @@ export default function RootLayout() {
       (_event, session) => {
         setUser(session?.user ?? null);
         setLoading(false);
+        if (session?.user) {
+          favoritesService.getFavoriteIds(session.user.id)
+            .then(setAll)
+            .catch(() => {});
+        } else {
+          setAll([]);
+        }
       },
     );
     return () => subscription.unsubscribe();
