@@ -40,7 +40,7 @@ export function ProductCard({
           />
         ) : (
           <View style={styles.imagePlaceholder}>
-            <MaterialIcons name="local-cafe" size={36} color={Colors.warmBeige} />
+            <MaterialIcons name="local-cafe" size={36} color={Colors.softMocha} />
           </View>
         )}
 
@@ -85,9 +85,11 @@ const styles = StyleSheet.create({
     width: 160,
     backgroundColor: Colors.surface,
     borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
     overflow: 'hidden',
     marginRight: Spacing[3],
-    ...Shadows.md,
+    ...Shadows.sm,
   },
   imageContainer: {
     width: '100%',

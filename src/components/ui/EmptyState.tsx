@@ -22,7 +22,7 @@ export function EmptyState({
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
-        <MaterialIcons name={icon} size={48} color={Colors.warmBeige} />
+        <MaterialIcons name={icon} size={48} color={Colors.softMocha} />
       </View>
       <Text style={styles.title}>{title}</Text>
       {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}

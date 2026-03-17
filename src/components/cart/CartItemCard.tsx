@@ -50,7 +50,7 @@ export function CartItemCard({
           />
         ) : (
           <View style={styles.imagePlaceholder}>
-            <MaterialIcons name="local-cafe" size={28} color={Colors.warmBeige} />
+            <MaterialIcons name="local-cafe" size={28} color={Colors.softMocha} />
           </View>
         )}
       </View>

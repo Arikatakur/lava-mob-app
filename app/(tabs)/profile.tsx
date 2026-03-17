@@ -26,8 +26,8 @@ function getTier(points: number) {
 
 function getTierColor(points: number) {
   if (points >= 1000) return Colors.accentCaramel;
-  if (points >= 500) return '#A8A8A8';
-  return '#CD7F32';
+  if (points >= 500) return Colors.softMocha;
+  return Colors.mutedGold;
 }
 
 function getTierLabel(points: number, t: ReturnType<typeof useTranslation>['t']) {

@@ -75,6 +75,11 @@ const styles = StyleSheet.create({
   buttonPrimary: {
     backgroundColor: Colors.primaryBrown,
     borderColor: Colors.primaryBrown,
+    shadowColor: Colors.primaryBrown,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 3,
   },
   buttonDisabled: {
     opacity: 0.4,

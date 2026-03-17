@@ -21,8 +21,8 @@ function getTier(points: number) {
 
 function getTierColor(points: number) {
   if (points >= 1000) return Colors.accentCaramel;
-  if (points >= 500) return '#A8A8A8';
-  return '#CD7F32';
+  if (points >= 500) return Colors.softMocha;
+  return Colors.mutedGold;
 }
 
 /** Simple visual QR code placeholder — 5×5 grid of squares */
@@ -87,7 +87,7 @@ export default function ScanScreen() {
       <SafeAreaView style={styles.safe}>
         <Header title={t.scan.title} showBack isRTL={isRTL} />
         <View style={styles.guestContainer}>
-          <MaterialIcons name="qr-code" size={64} color={Colors.warmBeige} />
+          <MaterialIcons name="qr-code" size={64} color={Colors.softMocha} />
           <Text style={styles.guestTitle}>{t.scan.title}</Text>
           <Text style={styles.guestSubtitle}>{t.scan.subtitle}</Text>
           <TouchableOpacity style={styles.signInBtn} onPress={() => router.push('/(auth)/login')}>

@@ -31,8 +31,8 @@ function getTier(points: number): 'bronze' | 'silver' | 'gold' {
 
 function getTierColor(tier: 'bronze' | 'silver' | 'gold'): string {
   if (tier === 'gold') return Colors.accentCaramel;
-  if (tier === 'silver') return '#A8A8A8';
-  return '#CD7F32';
+  if (tier === 'silver') return Colors.softMocha;
+  return Colors.mutedGold;
 }
 
 function getNextTierPoints(points: number): { next: number; label: string } | null {
@@ -289,7 +289,7 @@ export default function RewardsScreen() {
       <SafeAreaView style={styles.safe}>
         <Header title={t.rewards.title} showBack isRTL={isRTL} />
         <View style={styles.guestContainer}>
-          <MaterialIcons name="card-giftcard" size={64} color={Colors.warmBeige} />
+          <MaterialIcons name="card-giftcard" size={64} color={Colors.softMocha} />
           <Text style={styles.guestTitle}>{t.rewards.title}</Text>
           <Text style={styles.guestSubtitle}>{t.rewards.earnInfo}</Text>
           <TouchableOpacity style={styles.signInBtn} onPress={() => router.push('/(auth)/login')}>
@@ -348,7 +348,7 @@ export default function RewardsScreen() {
               <ActivityIndicator color={Colors.primaryBrown} style={{ marginTop: Spacing[8] }} />
             ) : rewards.length === 0 ? (
               <View style={styles.emptyState}>
-                <MaterialIcons name="card-giftcard" size={48} color={Colors.warmBeige} />
+                <MaterialIcons name="card-giftcard" size={48} color={Colors.softMocha} />
                 <Text style={styles.emptyText}>{t.rewards.noRewards}</Text>
               </View>
             ) : (
@@ -369,7 +369,7 @@ export default function RewardsScreen() {
           <View style={styles.historyList}>
             {transactions.length === 0 ? (
               <View style={styles.emptyState}>
-                <MaterialIcons name="history" size={48} color={Colors.warmBeige} />
+                <MaterialIcons name="history" size={48} color={Colors.softMocha} />
                 <Text style={styles.emptyText}>{t.rewards.noHistory}</Text>
                 <Text style={styles.emptySubText}>{t.rewards.noHistorySubtitle}</Text>
               </View>

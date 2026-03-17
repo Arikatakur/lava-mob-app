@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
   chipSelected: {
     backgroundColor: Colors.primaryBrown,
     borderColor: Colors.primaryBrown,
+    ...Shadows.sm,
   },
   label: {
     fontFamily: FontFamily.medium,
@@ -45,5 +46,6 @@ const styles = StyleSheet.create({
   labelSelected: {
     color: Colors.white,
     fontFamily: FontFamily.semiBold,
+    letterSpacing: 0.2,
   },
 });

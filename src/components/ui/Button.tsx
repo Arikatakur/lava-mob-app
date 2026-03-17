@@ -76,9 +76,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primaryBrown,
   },
   secondary: {
-    backgroundColor: Colors.backgroundSecondary,
+    backgroundColor: Colors.surface,
     borderWidth: 1.5,
-    borderColor: Colors.border,
+    borderColor: Colors.primaryBrown,
   },
   ghost: {
     backgroundColor: Colors.transparent,

@@ -32,9 +32,9 @@ function getTier(points: number) {
 }
 
 function getTierColor(points: number) {
-  if (points >= 1000) return Colors.accentCaramel;
-  if (points >= 500) return '#A8A8A8';
-  return '#CD7F32';
+  if (points >= 1000) return Colors.accentCaramel;    // gold
+  if (points >= 500) return Colors.softMocha;         // sage silver
+  return Colors.mutedGold;                            // warm bronze-gold
 }
 
 function LoyaltyCard({ points, isRTL, t }: {

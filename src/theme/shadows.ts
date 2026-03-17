@@ -4,7 +4,7 @@
  */
 import { Platform } from 'react-native';
 
-const shadowColor = '#3B2A22';
+const shadowColor = '#243121';
 
 export const Shadows = {
   none: {},

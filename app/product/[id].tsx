@@ -109,7 +109,7 @@ export default function ProductDetail() {
             />
           ) : (
             <View style={styles.imagePlaceholder}>
-              <MaterialIcons name="local-cafe" size={80} color={Colors.warmBeige} />
+              <MaterialIcons name="local-cafe" size={80} color={Colors.softMocha} />
             </View>
           )}
 
