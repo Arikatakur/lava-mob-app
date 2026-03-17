@@ -72,8 +72,7 @@ export const he = {
     yourPoints: 'הנקודות שלך',
     viewRewards: 'הצג הטבות',
     heroCoffee: 'קפה מיוחד',
-    heroCrafted: 'מוכן
-באהבה',
+    heroCrafted: 'מוכן באהבה',
     heroOrder: 'להזמין עכשיו',
   },
   menu: {
