@@ -44,7 +44,7 @@ export default function Cart() {
       <View style={styles.header}>
         <Text style={[styles.title, isRTL && styles.rtlText]}>{t.cart.title}</Text>
         <Text style={styles.itemCount}>
-          {items.length} {items.length === 1 ? 'item' : 'items'}
+          {items.length} {items.length === 1 ? t.cart.item : t.cart.items}
         </Text>
       </View>
 
@@ -62,6 +62,7 @@ export default function Cart() {
             unitPrice={item.unit_price}
             options={item.selected_options}
             language={language}
+            isRTL={isRTL}
             onIncrement={() => updateQuantity(item.id, item.quantity + 1)}
             onDecrement={() => updateQuantity(item.id, item.quantity - 1)}
             onRemove={() => removeItem(item.id)}

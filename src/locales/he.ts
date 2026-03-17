@@ -59,6 +59,7 @@ export const he = {
     skip: 'דלג',
   },
   home: {
+    title: 'בית',
     greeting: 'שלום',
     whatToday: 'מה תשתה היום?',
     featured: 'מומלצים',
@@ -70,6 +71,13 @@ export const he = {
     loyaltyCard: 'כרטיס נאמנות',
     yourPoints: 'הנקודות שלך',
     viewRewards: 'הצג הטבות',
+    heroCoffee: 'קפה מיוחד',
+    heroCrafted: 'מוכן
+באהבה',
+    heroOrder: 'להזמין עכשיו',
+  },
+  menu: {
+    title: 'תפריט',
   },
   product: {
     addToCart: 'הוסף לסל',
@@ -99,6 +107,9 @@ export const he = {
     remove: 'הסר',
     quantity: 'כמות',
     itemAdded: 'נוסף לסל!',
+    tabTitle: 'סל',
+    item: 'פריט',
+    items: 'פריטים',
   },
   checkout: {
     title: 'תשלום',
@@ -121,6 +132,8 @@ export const he = {
     cardNumberPlaceholder: '0000 0000 0000 0000',
     cardNamePlaceholder: 'שם מלא',
     expiryPlaceholder: 'MM/YY',
+    confirmPay: 'אשר תשלום של',
+    pay: 'שלם',
   },
   orderSuccess: {
     title: 'ההזמנה התקבלה!',
@@ -174,6 +187,9 @@ export const he = {
     support: 'תמיכה',
     about: 'אודות',
     account: 'חשבון',
+    tabTitle: 'פרופיל',
+    loyaltySection: 'נאמנות',
+    ptsTo: 'נקודות עד',
   },
   settings: {
     title: 'הגדרות',

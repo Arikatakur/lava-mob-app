@@ -25,10 +25,10 @@ import { useAuthStore } from '../../src/store/useAuthStore';
 import { Colors, FontFamily, FontSize, Spacing, Radius, Shadows } from '../../src/theme';
 import type { Product } from '../../src/types';
 
-function getTier(points: number) {
-  if (points >= 1000) return 'Gold';
-  if (points >= 500) return 'Silver';
-  return 'Bronze';
+function getTierLabel(points: number, t: ReturnType<typeof useTranslation>['t']) {
+  if (points >= 1000) return t.rewards.gold;
+  if (points >= 500) return t.rewards.silver;
+  return t.rewards.bronze;
 }
 
 function getTierColor(points: number) {
@@ -42,12 +42,12 @@ function LoyaltyCard({ points, isRTL, t }: {
   isRTL: boolean;
   t: ReturnType<typeof useTranslation>['t'];
 }) {
-  const tier = getTier(points);
+  const tier = getTierLabel(points, t);
   const tierColor = getTierColor(points);
   const tierMin = points >= 1000 ? 1000 : points >= 500 ? 500 : 0;
   const tierMax = points >= 1000 ? 1000 : points >= 500 ? 1000 : 500;
   const progress = Math.min(((points - tierMin) / (tierMax - tierMin)) * 100, 100);
-  const nextLabel = points >= 1000 ? null : points >= 500 ? 'Gold' : 'Silver';
+  const nextLabel = points >= 1000 ? null : points >= 500 ? t.rewards.gold : t.rewards.silver;
   const nextPts = points >= 1000 ? null : points >= 500 ? 1000 : 500;
 
   return (
@@ -76,7 +76,7 @@ function LoyaltyCard({ points, isRTL, t }: {
                 }]} />
               </View>
               <Text style={styles.loyaltyProgressLabel}>
-                {nextPts - points} pts → {nextLabel}
+                {nextPts - points} {t.profile.ptsTo} {nextLabel}
               </Text>
             </View>
           )}
@@ -179,13 +179,13 @@ export default function Home() {
         ) : (
           <View style={styles.heroBanner}>
             <View style={styles.heroContent}>
-              <Text style={styles.heroTag}>☕ Specialty Coffee</Text>
-              <Text style={styles.heroTitle}>Crafted{'\n'}with Passion</Text>
+              <Text style={styles.heroTag}>☕ {t.home.heroCoffee}</Text>
+              <Text style={styles.heroTitle}>{t.home.heroCrafted}</Text>
               <TouchableOpacity
                 style={styles.heroBtn}
                 onPress={() => router.push('/(tabs)/menu')}
               >
-                <Text style={styles.heroBtnText}>Order Now</Text>
+                <Text style={styles.heroBtnText}>{t.home.heroOrder}</Text>
               </TouchableOpacity>
             </View>
           </View>

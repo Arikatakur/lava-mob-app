@@ -42,7 +42,7 @@ export default function Favorites() {
           icon="favorite-border"
           title={t.favorites.empty}
           subtitle={t.favorites.emptySubtitle}
-          actionLabel="Browse Menu"
+          actionLabel={t.cart.browseMenu}
           onAction={() => router.push('/(tabs)/menu')}
         />
       ) : (

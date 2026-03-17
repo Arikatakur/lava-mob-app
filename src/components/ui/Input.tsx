@@ -40,6 +40,7 @@ export function Input({
       <View
         style={[
           styles.inputWrapper,
+          isRTL && styles.inputWrapperRTL,
           focused && styles.inputFocused,
           error ? styles.inputError : null,
         ]}
@@ -117,11 +118,14 @@ const styles = StyleSheet.create({
   rtlInput: {
     textAlign: 'right',
   },
+  inputWrapperRTL: {
+    flexDirection: 'row-reverse',
+  },
   leftIcon: {
-    marginRight: Spacing[2],
+    marginHorizontal: Spacing[1],
   },
   rightIcon: {
-    marginLeft: Spacing[2],
+    marginHorizontal: Spacing[1],
   },
   errorText: {
     fontFamily: FontFamily.regular,

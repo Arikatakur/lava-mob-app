@@ -19,6 +19,7 @@ interface CartItemCardProps {
   unitPrice: number;
   options: SelectedOption[];
   language: 'he' | 'en';
+  isRTL?: boolean;
   onIncrement: () => void;
   onDecrement: () => void;
   onRemove: () => void;
@@ -31,6 +32,7 @@ export function CartItemCard({
   unitPrice,
   options,
   language,
+  isRTL = false,
   onIncrement,
   onDecrement,
   onRemove,
@@ -39,9 +41,9 @@ export function CartItemCard({
     language === 'he' ? o.name_he : o.name_en;
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, isRTL && styles.rtl]}>
       {/* Image */}
-      <View style={styles.imageContainer}>
+      <View style={[styles.imageContainer, isRTL && styles.imageContainerRTL]}>
         {product.image_url ? (
           <Image
             source={{ uri: product.image_url }}
@@ -57,8 +59,8 @@ export function CartItemCard({
 
       {/* Details */}
       <View style={styles.details}>
-        <View style={styles.topRow}>
-          <Text style={styles.name} numberOfLines={2}>
+        <View style={[styles.topRow, isRTL && styles.rtl]}>
+          <Text style={[styles.name, isRTL && styles.nameRTL]} numberOfLines={2}>
             {localizedName}
           </Text>
           <TouchableOpacity onPress={onRemove} style={styles.removeBtn}>
@@ -72,7 +74,7 @@ export function CartItemCard({
           </Text>
         )}
 
-        <View style={styles.bottomRow}>
+        <View style={[styles.bottomRow, isRTL && styles.rtl]}>
           <Text style={styles.price}>₪{(unitPrice * quantity).toFixed(0)}</Text>
           <QuantityStepper
             value={quantity}
@@ -128,7 +130,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.base,
     color: Colors.textPrimary,
     lineHeight: 20,
-    marginRight: Spacing[2],
+    marginRight: Spacing[2], // overridden in RTL via nameRTL
   },
   removeBtn: {
     padding: 2,
@@ -148,5 +150,17 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.bold,
     fontSize: FontSize.base,
     color: Colors.primaryBrown,
+  },
+  rtl: {
+    flexDirection: 'row-reverse',
+  },
+  imageContainerRTL: {
+    marginRight: 0,
+    marginLeft: Spacing[3],
+  },
+  nameRTL: {
+    marginRight: 0,
+    marginLeft: Spacing[2],
+    textAlign: 'right',
   },
 });

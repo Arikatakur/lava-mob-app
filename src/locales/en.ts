@@ -59,6 +59,7 @@ export const en = {
     skip: 'Skip',
   },
   home: {
+    title: 'Home',
     greeting: 'Hello',
     whatToday: "What'll it be today?",
     featured: 'Featured',
@@ -70,6 +71,13 @@ export const en = {
     loyaltyCard: 'Loyalty Card',
     yourPoints: 'Your Points',
     viewRewards: 'View Rewards',
+    heroCoffee: 'Specialty Coffee',
+    heroCrafted: 'Crafted with
+Passion',
+    heroOrder: 'Order Now',
+  },
+  menu: {
+    title: 'Menu',
   },
   product: {
     addToCart: 'Add to Cart',
@@ -99,6 +107,9 @@ export const en = {
     remove: 'Remove',
     quantity: 'Qty',
     itemAdded: 'Added to cart!',
+    tabTitle: 'Cart',
+    item: 'item',
+    items: 'items',
   },
   checkout: {
     title: 'Checkout',
@@ -121,6 +132,8 @@ export const en = {
     cardNumberPlaceholder: '0000 0000 0000 0000',
     cardNamePlaceholder: 'Full name',
     expiryPlaceholder: 'MM/YY',
+    confirmPay: 'Confirm payment of',
+    pay: 'Pay',
   },
   orderSuccess: {
     title: 'Order Placed!',
@@ -174,6 +187,9 @@ export const en = {
     support: 'Support',
     about: 'About',
     account: 'Account',
+    tabTitle: 'Profile',
+    loyaltySection: 'Loyalty',
+    ptsTo: 'pts to',
   },
   settings: {
     title: 'Settings',

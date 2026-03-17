@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
     overflow: 'hidden',
-    marginRight: Spacing[3],
+    marginHorizontal: Spacing[1.5],
     ...Shadows.sm,
   },
   imageContainer: {

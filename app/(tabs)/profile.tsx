@@ -150,7 +150,7 @@ export default function Profile() {
                     }]} />
                   </View>
                   <Text style={styles.progressLabel}>
-                    {nextTierPts - points} pts to {points >= 500 ? 'Gold' : 'Silver'}
+                    {nextTierPts - points} {t.profile.ptsTo} {points >= 500 ? t.rewards.gold : t.rewards.silver}
                   </Text>
                 </View>
               )}
@@ -161,7 +161,7 @@ export default function Profile() {
         {/* Loyalty section */}
         {!isGuest && (
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, isRTL && styles.rtlText]}>Loyalty</Text>
+            <Text style={[styles.sectionTitle, isRTL && styles.rtlText]}>{t.profile.loyaltySection}</Text>
             <View style={styles.menuCard}>
               <MenuItem
                 icon="card-giftcard"
@@ -258,7 +258,7 @@ export default function Profile() {
         </View>
 
         <View style={styles.versionRow}>
-          <Text style={styles.versionText}>Lava Cafe v1.0.0</Text>
+          <Text style={styles.versionText}>{t.common.appName} {t.settings.version} 1.0.0</Text>
         </View>
       </ScrollView>
     </ScreenWrapper>

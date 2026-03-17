@@ -105,10 +105,10 @@ export default function Checkout() {
       const Alert = require('react-native').Alert;
       Alert.alert(
         NATIVE_PAY_LABEL,
-        `Confirm payment of ₪${total.toFixed(0)}?`,
+        `${t.checkout.confirmPay} ₪${total.toFixed(0)}?`,
         [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Pay', onPress: placeOrder },
+          { text: t.common.cancel, style: 'cancel' },
+          { text: t.checkout.pay, onPress: placeOrder },
         ],
       );
     } else {
@@ -409,7 +409,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.semiBold,
     fontSize: FontSize.base,
     color: Colors.textPrimary,
-    marginLeft: Spacing[3],
   },
   // Payment method
   paymentOption: {

@@ -66,7 +66,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Home',
+          title: t.home.title,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="home" color={color} focused={focused} />
           ),
@@ -75,7 +75,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="menu"
         options={{
-          title: 'Menu',
+          title: t.menu.title,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="menu-book" color={color} focused={focused} />
           ),
@@ -84,7 +84,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="cart"
         options={{
-          title: t.cart.title,
+          title: t.cart.tabTitle,
           tabBarIcon: ({ color, focused }) => (
             <CartTabIcon color={color} focused={focused} />
           ),
@@ -102,7 +102,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: t.profile.title,
+          title: t.profile.tabTitle,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="person" color={color} focused={focused} />
           ),

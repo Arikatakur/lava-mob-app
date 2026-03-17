@@ -67,7 +67,7 @@ export default function Menu() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={[styles.title, isRTL && styles.rtlText]}>
-          {isSearching ? t.search.title : 'Menu'}
+          {isSearching ? t.search.title : t.menu.title}
         </Text>
       </View>
 
