@@ -241,4 +241,15 @@ export const en = {
     points: 'Points',
     tierLabel: 'Tier',
   },
+  orderMode: {
+    headline: 'How would you like\nto order today?',
+    subline: 'Choose your experience for this visit',
+    delivery: 'Delivery',
+    deliverySub: "We'll bring it to your door",
+    pickup: 'Pickup',
+    pickupSub: 'Order ahead, collect at store',
+    dineIn: 'Dine-in',
+    dineInSub: 'Enjoy it here with us',
+    continueBtn: 'Continue',
+  },
 };

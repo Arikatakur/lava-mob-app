@@ -4,6 +4,9 @@
 
 export type Language = 'he' | 'en';
 
+/** How the customer intends to receive their order this session. */
+export type OrderMode = 'delivery' | 'pickup' | 'dine_in';
+
 export interface Category {
   id: string;
   name_en: string;

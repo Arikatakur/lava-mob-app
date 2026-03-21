@@ -241,4 +241,15 @@ export const he = {
     points: 'נקודות',
     tierLabel: 'רמה',
   },
+  orderMode: {
+    headline: 'איך תרצה להזמין\nהיום?',
+    subline: 'בחר את חוויית ההזמנה שלך לביקור זה',
+    delivery: 'משלוח',
+    deliverySub: 'נביא לדלת שלך',
+    pickup: 'איסוף עצמי',
+    pickupSub: 'הזמן מראש ואסוף בסניף',
+    dineIn: 'ישיבה במקום',
+    dineInSub: 'תהנה כאן אצלנו',
+    continueBtn: 'המשך',
+  },
 };
