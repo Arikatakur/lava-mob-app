@@ -4,8 +4,10 @@ import {
   Text,
   FlatList,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
 import { router } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
 import { ScreenWrapper } from '../../src/components/layout/ScreenWrapper';
 import { CartItemCard } from '../../src/components/cart/CartItemCard';
 import { EmptyState } from '../../src/components/ui/EmptyState';
@@ -13,12 +15,27 @@ import { Button } from '../../src/components/ui/Button';
 import { useTranslation } from '../../src/hooks/useTranslation';
 import { useLocalizedText } from '../../src/hooks/useLocalizedText';
 import { useCartStore } from '../../src/store/useCartStore';
-import { Colors, FontFamily, FontSize, Spacing, Shadows } from '../../src/theme';
+import { useAppStore } from '../../src/store/useAppStore';
+import { Colors, FontFamily, FontSize, Radius, Spacing, Shadows } from '../../src/theme';
+import type { OrderMode } from '../../src/types';
+
+// ── Mode meta (icon + i18n key) ───────────────────────────────────
+const MODE_ICON: Record<OrderMode, keyof typeof MaterialIcons.glyphMap> = {
+  delivery: 'delivery-dining',
+  pickup:   'storefront',
+  dine_in:  'restaurant',
+};
+const MODE_LABEL_KEY: Record<OrderMode, 'delivery' | 'pickup' | 'dineIn'> = {
+  delivery: 'delivery',
+  pickup:   'pickup',
+  dine_in:  'dineIn',
+};
 
 export default function Cart() {
   const { t, language, isRTL } = useTranslation();
   const { localize } = useLocalizedText();
   const { items, removeItem, updateQuantity, getTotal } = useCartStore();
+  const { orderMode } = useAppStore();
 
   const total = getTotal();
 
@@ -73,6 +90,32 @@ export default function Cart() {
 
       {/* Summary */}
       <View style={styles.summary}>
+
+        {/* Order mode chip */}
+        {orderMode && (
+          <TouchableOpacity
+            style={[styles.modeRow, isRTL && styles.rtl]}
+            onPress={() => router.push('/order-mode' as never)}
+            activeOpacity={0.75}
+          >
+            <View style={[styles.modeLeft, isRTL && styles.rtl]}>
+              <View style={styles.modeIconWrap}>
+                <MaterialIcons
+                  name={MODE_ICON[orderMode]}
+                  size={14}
+                  color={Colors.darkEspresso}
+                />
+              </View>
+              <Text style={styles.modeLabel}>
+                {t.orderMode[MODE_LABEL_KEY[orderMode]]}
+              </Text>
+            </View>
+            <Text style={styles.modeChange}>{t.cart.changeMode}</Text>
+          </TouchableOpacity>
+        )}
+
+        <View style={styles.dividerThin} />
+
         <View style={[styles.summaryRow, isRTL && styles.rtl]}>
           <Text style={styles.summaryLabel}>{t.cart.subtotal}</Text>
           <Text style={styles.summaryValue}>₪{total.toFixed(0)}</Text>
@@ -128,6 +171,42 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.border,
     ...Shadows.lg,
   },
+  // Mode chip row
+  modeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: Spacing[3],
+  },
+  modeLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing[2],
+  },
+  modeIconWrap: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: Colors.backgroundSecondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modeLabel: {
+    fontFamily: FontFamily.medium,
+    fontSize: FontSize.sm,
+    color: Colors.textPrimary,
+  },
+  modeChange: {
+    fontFamily: FontFamily.medium,
+    fontSize: FontSize.xs,
+    color: Colors.primaryBrown,
+  },
+  dividerThin: {
+    height: 1,
+    backgroundColor: Colors.border,
+    marginBottom: Spacing[3],
+  },
+
   summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',

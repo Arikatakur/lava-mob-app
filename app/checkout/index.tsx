@@ -17,11 +17,21 @@ import { useTranslation } from '../../src/hooks/useTranslation';
 import { useLocalizedText } from '../../src/hooks/useLocalizedText';
 import { useCartStore } from '../../src/store/useCartStore';
 import { useAuthStore } from '../../src/store/useAuthStore';
+import { useAppStore } from '../../src/store/useAppStore';
 import { ordersService } from '../../src/services/orders.service';
 import { authService } from '../../src/services/auth.service';
 import { Colors, FontFamily, FontSize, Radius, Spacing, Shadows } from '../../src/theme';
 
+import type { OrderMode } from '../../src/types';
+
 type PaymentMethod = 'native_pay' | 'credit_card' | 'cash';
+
+// ── Mode meta ─────────────────────────────────────────────────────
+const MODE_ICON: Record<OrderMode, keyof typeof MaterialIcons.glyphMap> = {
+  delivery: 'delivery-dining',
+  pickup:   'storefront',
+  dine_in:  'restaurant',
+};
 
 function formatCardNumber(value: string) {
   const digits = value.replace(/\D/g, '').slice(0, 16);
@@ -44,6 +54,18 @@ export default function Checkout() {
   const { localize } = useLocalizedText();
   const { items, getTotal, clearCart } = useCartStore();
   const { user, setProfile } = useAuthStore();
+  const { orderMode } = useAppStore();
+
+  // Cash label depends on the active fulfillment mode
+  const cashLabel =
+    orderMode === 'delivery' ? t.checkout.cashDelivery :
+    orderMode === 'dine_in'  ? t.checkout.cashDineIn   :
+    t.checkout.cash;
+
+  // Mode label for the fulfillment section header
+  const modeLabelKey =
+    orderMode === 'delivery' ? 'delivery' :
+    orderMode === 'dine_in'  ? 'dineIn'   : 'pickup';
 
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
@@ -119,7 +141,7 @@ export default function Checkout() {
   const paymentOptions: { key: PaymentMethod; icon: keyof typeof MaterialIcons.glyphMap; label: string }[] = [
     { key: 'native_pay', icon: NATIVE_PAY_ICON, label: NATIVE_PAY_LABEL },
     { key: 'credit_card', icon: 'credit-card', label: t.checkout.creditCard },
-    { key: 'cash', icon: 'payments', label: t.checkout.cash },
+    { key: 'cash', icon: 'payments', label: cashLabel },
   ];
 
   return (
@@ -127,6 +149,35 @@ export default function Checkout() {
       <Header title={t.checkout.title} showBack isRTL={isRTL} />
 
       <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+        {/* Fulfillment mode */}
+        {orderMode && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, isRTL && styles.rtlText]}>
+              {t.checkout.fulfillment}
+            </Text>
+            <View style={[styles.card, styles.fulfillmentRow, isRTL && styles.rtl]}>
+              <View style={[styles.fulfillmentLeft, isRTL && styles.rtl]}>
+                <View style={styles.fulfillmentIcon}>
+                  <MaterialIcons
+                    name={MODE_ICON[orderMode]}
+                    size={20}
+                    color={Colors.darkEspresso}
+                  />
+                </View>
+                <Text style={styles.fulfillmentLabel}>
+                  {t.orderMode[modeLabelKey]}
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => router.push('/order-mode' as never)}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Text style={styles.fulfillmentChange}>{t.cart.changeMode}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
         {/* Order Summary */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, isRTL && styles.rtlText]}>
@@ -591,6 +642,38 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     lineHeight: 18,
   },
+  // Fulfillment row
+  fulfillmentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing[4],
+    paddingVertical: Spacing[3] + 2,
+  },
+  fulfillmentLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing[3],
+  },
+  fulfillmentIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: Colors.backgroundSecondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fulfillmentLabel: {
+    fontFamily: FontFamily.semiBold,
+    fontSize: FontSize.base,
+    color: Colors.textPrimary,
+  },
+  fulfillmentChange: {
+    fontFamily: FontFamily.medium,
+    fontSize: FontSize.sm,
+    color: Colors.primaryBrown,
+  },
+
   bottomPad: { height: Spacing[4] },
   bottomBar: {
     backgroundColor: Colors.surface,

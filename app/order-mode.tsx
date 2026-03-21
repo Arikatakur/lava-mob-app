@@ -1,21 +1,26 @@
 /**
- * OrderModeScreen — shown on every app launch after auth resolves.
+ * OrderModeScreen
  *
- * The user picks Delivery / Pickup / Dine-in before entering the main tabs.
- * Calling setOrderMode() sets orderModeSelected = true in the store so
- * index.tsx routes forward. The selection is NOT persisted across launches,
- * but the last-used mode is saved to AsyncStorage for pre-selection only.
+ * Shown on every app launch, right after auth resolves.
+ * The user picks Delivery / Pickup / Dine-in before reaching the main tabs.
  *
- * Animation
- * ─────────────────────────────────────────────────────────────────
- *  • Header fades + slides in from top  (delay 0)
- *  • Card 1 fades + slides up           (delay 120ms)
- *  • Card 2 fades + slides up           (delay 210ms)
- *  • Card 3 fades + slides up           (delay 300ms)
- *  • Continue button fades in when a mode is selected
+ * Calling setOrderMode() flips orderModeSelected → true in the Zustand store
+ * (in-memory only), which lets index.tsx forward to /(tabs)/home.
+ *
+ * The last-chosen mode is persisted to AsyncStorage for pre-selection only —
+ * the screen is still always shown on every fresh session.
+ *
+ * Animation sequence
+ * ──────────────────
+ *  Brand mark  – fade + slide-up, delay   0 ms
+ *  Headline    – fade + slide-up, delay  60 ms
+ *  Card 1      – fade + slide-up, delay 140 ms
+ *  Card 2      – fade + slide-up, delay 220 ms
+ *  Card 3      – fade + slide-up, delay 300 ms
+ *  Button      – fade + slide-up, delay 360 ms
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Platform,
@@ -29,14 +34,21 @@ import {
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Colors, FontFamily, FontSize, Radius, Shadows, Spacing } from '../src/theme';
+import {
+  Colors,
+  FontFamily,
+  FontSize,
+  Radius,
+  Spacing,
+} from '../src/theme';
 import { useAppStore } from '../src/store/useAppStore';
 import { useTranslation } from '../src/hooks/useTranslation';
 import type { OrderMode } from '../src/types';
 
-// ── Constants ─────────────────────────────────────────────────────
+// ── Persistence key ───────────────────────────────────────────────
 const LAST_MODE_KEY = '@lava_last_order_mode';
 
+// ── Mode config ───────────────────────────────────────────────────
 type ModeConfig = {
   key: OrderMode;
   icon: keyof typeof MaterialIcons.glyphMap;
@@ -50,60 +62,71 @@ const MODES: ModeConfig[] = [
   { key: 'dine_in',  icon: 'restaurant',      labelKey: 'dineIn',   subKey: 'dineInSub'   },
 ];
 
-// ── Animated entrance helper ──────────────────────────────────────
+// ── Entrance hook — returns raw Animated.Values ───────────────────
+// Keeping them separate (not merged into a style object) avoids unsafe
+// transform-array concatenation when composing with pressScale below.
 function useEntrance(delay: number) {
-  const opacity   = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(22)).current;
+  const opacity    = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(24)).current;
 
   useEffect(() => {
     Animated.parallel([
       Animated.timing(opacity, {
         toValue: 1,
-        duration: 420,
+        duration: 400,
         delay,
         useNativeDriver: true,
       }),
       Animated.timing(translateY, {
         toValue: 0,
-        duration: 380,
+        duration: 360,
         delay,
         useNativeDriver: true,
       }),
     ]).start();
   }, []);
 
-  return { opacity, transform: [{ translateY }] };
+  return { opacity, translateY };
 }
 
 // ── Mode Card ─────────────────────────────────────────────────────
 interface CardProps {
-  config: ModeConfig;
-  selected: boolean;
-  onPress: () => void;
-  isRTL: boolean;
-  label: string;
-  sub: string;
-  animStyle: object;
+  config:     ModeConfig;
+  selected:   boolean;
+  onPress:    () => void;
+  isRTL:      boolean;
+  label:      string;
+  sub:        string;
+  opacity:    Animated.Value;
+  translateY: Animated.Value;
 }
 
-function ModeCard({ config, selected, onPress, isRTL, label, sub, animStyle }: CardProps) {
-  // Subtle scale feedback on press
+function ModeCard({
+  config, selected, onPress, isRTL,
+  label, sub, opacity, translateY,
+}: CardProps) {
   const pressScale = useRef(new Animated.Value(1)).current;
 
-  const handlePressIn  = () =>
-    Animated.spring(pressScale, { toValue: 0.975, useNativeDriver: true, speed: 50 }).start();
-  const handlePressOut = () =>
+  const onPressIn  = () =>
+    Animated.spring(pressScale, { toValue: 0.972, useNativeDriver: true, speed: 50 }).start();
+  const onPressOut = () =>
     Animated.spring(pressScale, { toValue: 1,     useNativeDriver: true, speed: 50 }).start();
 
   return (
-    <Animated.View style={[animStyle, { transform: [...(animStyle as any).transform, { scale: pressScale }] }]}>
+    // Entrance + press transforms live in the same array — no casting needed.
+    <Animated.View
+      style={{
+        opacity,
+        transform: [{ translateY }, { scale: pressScale }],
+      }}
+    >
       <Pressable
         onPress={onPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
         style={[
           styles.card,
-          isRTL && styles.cardRTL,
+          isRTL    && styles.cardRTL,
           selected && styles.cardSelected,
         ]}
         accessibilityRole="radio"
@@ -119,19 +142,22 @@ function ModeCard({ config, selected, onPress, isRTL, label, sub, animStyle }: C
           />
         </View>
 
-        {/* Text */}
+        {/* Labels */}
         <View style={[styles.cardText, isRTL && styles.cardTextRTL]}>
-          <Text style={[styles.cardTitle, isRTL && styles.textRTL]}>{label}</Text>
-          <Text style={[styles.cardSub,   isRTL && styles.textRTL]}>{sub}</Text>
+          <Text style={[styles.cardTitle, isRTL && styles.rtlText]}>{label}</Text>
+          <Text style={[styles.cardSub,   isRTL && styles.rtlText]}>{sub}</Text>
         </View>
 
-        {/* Checkmark */}
+        {/* Selection indicator */}
         <View style={styles.checkZone}>
-          {selected && (
-            <View style={styles.checkCircle}>
-              <MaterialIcons name="check" size={14} color={Colors.backgroundPrimary} />
-            </View>
-          )}
+          {selected
+            ? (
+              <View style={styles.checkFill}>
+                <MaterialIcons name="check" size={13} color={Colors.backgroundPrimary} />
+              </View>
+            )
+            : <View style={styles.checkEmpty} />
+          }
         </View>
       </Pressable>
     </Animated.View>
@@ -145,21 +171,18 @@ export default function OrderModeScreen() {
 
   const [selected, setSelected] = useState<OrderMode | null>(null);
 
-  // Load last-used mode for pre-selection
+  // Pre-select last-used mode (user can still change or just tap Continue)
   useEffect(() => {
     AsyncStorage.getItem(LAST_MODE_KEY)
       .then((val) => { if (val) setSelected(val as OrderMode); })
       .catch(() => {});
   }, []);
 
-  // Entrance animations
-  const headerAnim = useEntrance(0);
-  const card0Anim  = useEntrance(120);
-  const card1Anim  = useEntrance(210);
-  const card2Anim  = useEntrance(300);
-  const btnAnim    = useEntrance(380);
-
-  const cardAnims = [card0Anim, card1Anim, card2Anim];
+  // Staggered entrance animations
+  const brand   = useEntrance(0);
+  const headline = useEntrance(60);
+  const cards   = [useEntrance(140), useEntrance(220), useEntrance(300)];
+  const btn     = useEntrance(360);
 
   const handleContinue = () => {
     if (!selected) return;
@@ -169,26 +192,27 @@ export default function OrderModeScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.screen, isRTL && styles.screenRTL]}>
-      {/* ── Brand mark ────────────────────────────────────────── */}
-      <Animated.View style={[styles.brandRow, headerAnim]}>
+    <SafeAreaView style={styles.screen}>
+
+      {/* ── Brand mark ──────────────────────────────────────────── */}
+      <Animated.View style={[styles.brandRow, { opacity: brand.opacity, transform: [{ translateY: brand.translateY }] }]}>
         <View style={styles.brandBadge}>
           <Text style={styles.brandLetter} allowFontScaling={false}>L</Text>
         </View>
         <Text style={styles.brandName} allowFontScaling={false}>LAVA CAFE</Text>
       </Animated.View>
 
-      {/* ── Headline ──────────────────────────────────────────── */}
-      <Animated.View style={[styles.headlineBlock, headerAnim]}>
-        <Text style={[styles.headline, isRTL && styles.textRTL]}>
+      {/* ── Headline ────────────────────────────────────────────── */}
+      <Animated.View style={[styles.headlineBlock, { opacity: headline.opacity, transform: [{ translateY: headline.translateY }] }]}>
+        <Text style={[styles.headline, isRTL && styles.rtlText]}>
           {t.orderMode.headline}
         </Text>
-        <Text style={[styles.subline, isRTL && styles.textRTL]}>
+        <Text style={[styles.subline, isRTL && styles.rtlText]}>
           {t.orderMode.subline}
         </Text>
       </Animated.View>
 
-      {/* ── Mode cards ────────────────────────────────────────── */}
+      {/* ── Mode cards ──────────────────────────────────────────── */}
       <View style={styles.cardsBlock}>
         {MODES.map((mode, i) => (
           <ModeCard
@@ -199,13 +223,14 @@ export default function OrderModeScreen() {
             isRTL={isRTL}
             label={t.orderMode[mode.labelKey]}
             sub={t.orderMode[mode.subKey]}
-            animStyle={cardAnims[i]}
+            opacity={cards[i].opacity}
+            translateY={cards[i].translateY}
           />
         ))}
       </View>
 
-      {/* ── Continue button ───────────────────────────────────── */}
-      <Animated.View style={[styles.btnWrapper, btnAnim]}>
+      {/* ── Continue button ─────────────────────────────────────── */}
+      <Animated.View style={[styles.btnWrapper, { opacity: btn.opacity, transform: [{ translateY: btn.translateY }] }]}>
         <TouchableOpacity
           style={[styles.btn, !selected && styles.btnDisabled]}
           onPress={handleContinue}
@@ -223,6 +248,7 @@ export default function OrderModeScreen() {
           />
         </TouchableOpacity>
       </Animated.View>
+
     </SafeAreaView>
   );
 }
@@ -232,86 +258,83 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: Colors.backgroundPrimary,
-    paddingHorizontal: Spacing[5],       // 20px
-    paddingTop: Spacing[8],              // 32px — below safe area
-    paddingBottom: Spacing[6],           // 24px
-  },
-  screenRTL: {
-    // RTL layout flip is handled per-element via textRTL / cardRTL
+    paddingHorizontal: Spacing[5],
+    paddingTop: Spacing[8],
+    paddingBottom: Spacing[8],
   },
 
-  // ── Brand mark ──────────────────────────────────────────────────
+  // Brand mark
   brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: Spacing[10],           // 40px
+    marginBottom: Spacing[10],
   },
   brandBadge: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: Colors.darkEspresso,
     alignItems: 'center',
     justifyContent: 'center',
-    marginEnd: 8,
+    marginEnd: 9,
     ...Platform.select({
-      ios:     { shadowColor: '#1B2E1A', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.16, shadowRadius: 8 },
-      android: { elevation: 4 },
+      ios:     { shadowColor: '#1B2E1A', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.18, shadowRadius: 10 },
+      android: { elevation: 5 },
     }),
   },
   brandLetter: {
     fontFamily: FontFamily.bold,
-    fontSize: 18,
-    lineHeight: 22,
+    fontSize: 19,
+    lineHeight: 23,
     color: Colors.backgroundPrimary,
     includeFontPadding: false,
   },
   brandName: {
     fontFamily: FontFamily.semiBold,
     fontSize: FontSize.xs,
-    letterSpacing: 4,
+    letterSpacing: 4.5,
     color: Colors.darkEspresso,
   },
 
-  // ── Headline ────────────────────────────────────────────────────
+  // Headline
   headlineBlock: {
-    marginBottom: Spacing[8],            // 32px
+    marginBottom: Spacing[7],
   },
   headline: {
     fontFamily: FontFamily.bold,
-    fontSize: FontSize['2xl'],           // ~28px
-    lineHeight: FontSize['2xl'] * 1.28,
+    fontSize: FontSize['4xl'],     // 28px
+    lineHeight: FontSize['4xl'] * 1.25,
     color: Colors.textPrimary,
-    marginBottom: Spacing[2],            // 8px
+    marginBottom: Spacing[2],
   },
   subline: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.sm,
     color: Colors.textMuted,
-    lineHeight: FontSize.sm * 1.6,
+    lineHeight: FontSize.sm * 1.65,
   },
-  textRTL: {
+  rtlText: {
     textAlign: 'right',
     writingDirection: 'rtl',
   },
 
-  // ── Cards ───────────────────────────────────────────────────────
+  // Cards
   cardsBlock: {
-    gap: Spacing[3],                     // 12px between cards
-    marginBottom: Spacing[8],
+    gap: Spacing[3],
+    marginBottom: Spacing[6],
   },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.surface,
-    borderRadius: Radius.xl,             // 20px
+    borderRadius: Radius.xl,
     borderWidth: 1.5,
     borderColor: Colors.border,
-    paddingVertical: Spacing[4],         // 16px
+    paddingVertical: Spacing[4],
     paddingHorizontal: Spacing[4],
     ...Platform.select({
-      ios:     { shadowColor: '#1B2E1A', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8 },
+      ios:     { shadowColor: '#1B2E1A', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.055, shadowRadius: 8 },
       android: { elevation: 2 },
     }),
   },
@@ -320,18 +343,17 @@ const styles = StyleSheet.create({
   },
   cardSelected: {
     borderColor: Colors.darkEspresso,
-    backgroundColor: Colors.backgroundSecondary,  // light sage tint
+    backgroundColor: Colors.backgroundSecondary,
     ...Platform.select({
-      ios:     { shadowOpacity: 0.12, shadowRadius: 12 },
+      ios:     { shadowOpacity: 0.11, shadowRadius: 14 },
       android: { elevation: 5 },
     }),
   },
 
-  // Icon badge
   iconBadge: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     backgroundColor: Colors.backgroundSecondary,
     alignItems: 'center',
     justifyContent: 'center',
@@ -341,7 +363,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.darkEspresso,
   },
 
-  // Card text
   cardText: {
     flex: 1,
   },
@@ -360,18 +381,17 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.regular,
     fontSize: FontSize.xs,
     color: Colors.textMuted,
-    lineHeight: FontSize.xs * 1.5,
+    lineHeight: FontSize.xs * 1.55,
   },
 
-  // Checkmark zone
   checkZone: {
-    width: 24,
-    height: 24,
+    width: 22,
+    height: 22,
     alignItems: 'center',
     justifyContent: 'center',
     marginStart: Spacing[2],
   },
-  checkCircle: {
+  checkFill: {
     width: 22,
     height: 22,
     borderRadius: 11,
@@ -379,10 +399,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  checkEmpty: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+  },
 
-  // ── Continue button ──────────────────────────────────────────────
+  // Continue button
   btnWrapper: {
-    marginTop: 'auto',                   // push to bottom
+    marginTop: 'auto',
   },
   btn: {
     flexDirection: 'row',
@@ -390,10 +417,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: Colors.darkEspresso,
     borderRadius: Radius.xl,
-    paddingVertical: Spacing[4],         // 16px
+    paddingVertical: Spacing[4] + 2,
     ...Platform.select({
-      ios:     { shadowColor: '#1B2E1A', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.22, shadowRadius: 14 },
-      android: { elevation: 6 },
+      ios:     { shadowColor: '#1B2E1A', shadowOffset: { width: 0, height: 7 }, shadowOpacity: 0.24, shadowRadius: 16 },
+      android: { elevation: 7 },
     }),
   },
   btnDisabled: {
