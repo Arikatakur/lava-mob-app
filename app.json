@@ -8,9 +8,9 @@
     "userInterfaceStyle": "light",
     "scheme": "lavacafe",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/lava-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F7F3EE"
+      "backgroundColor": "#F8F6F1"
     },
     "ios": {
       "supportsTablet": false,
@@ -38,8 +38,8 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F7F3EE",
-          "image": "./assets/splash-icon.png",
+          "backgroundColor": "#F8F6F1",
+          "image": "./assets/lava-icon.png",
           "imageWidth": 200
         }
       ]

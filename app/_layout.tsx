@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -11,6 +11,7 @@ import { useAppStore } from '../src/store/useAppStore';
 import { useFavoritesStore } from '../src/store/useFavoritesStore';
 import { favoritesService } from '../src/services/favorites.service';
 import { Colors } from '../src/theme';
+import { AppLoadingScreen } from '../src/components/ui/AppLoadingScreen';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -26,8 +27,12 @@ export default function RootLayout() {
     Poppins_700Bold,
   });
 
+  /** true while our custom branded splash is animating */
+  const [splashVisible, setSplashVisible] = useState(true);
+
   useEffect(() => {
     if (fontsLoaded) {
+      // Hide the native splash immediately — our custom one takes over.
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
@@ -50,12 +55,16 @@ export default function RootLayout() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Keep native splash visible until fonts are ready
   if (!fontsLoaded) return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <StatusBar style="dark" backgroundColor={Colors.backgroundPrimary} />
+        <StatusBar
+          style="dark"
+          backgroundColor={Colors.backgroundPrimary}
+        />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="onboarding" />
@@ -112,6 +121,11 @@ export default function RootLayout() {
             }}
           />
         </Stack>
+
+        {/* Premium branded splash — overlays all content, self-removes on finish */}
+        {splashVisible && (
+          <AppLoadingScreen onFinish={() => setSplashVisible(false)} />
+        )}
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

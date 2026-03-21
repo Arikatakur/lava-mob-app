@@ -69,7 +69,7 @@ export function CartItemCard({
         </View>
 
         {options.length > 0 && (
-          <Text style={styles.options} numberOfLines={1}>
+          <Text style={[styles.options, isRTL && { textAlign: "right" as const }]} numberOfLines={1}>
             {options.map(optionLabel).join(' · ')}
           </Text>
         )}
