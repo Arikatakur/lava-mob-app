@@ -1,29 +1,29 @@
 {
   "expo": {
-    "name": "Lava Cafe",
-    "slug": "lava-cafe",
-    "version": "1.0.0",
+    "name": "Sukar Helo",
+    "slug": "sukar-helo",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/lava-icon.png",
     "userInterfaceStyle": "light",
-    "scheme": "lavacafe",
+    "scheme": "sukarhelo",
     "splash": {
       "image": "./assets/lava-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F8F6F1"
+      "backgroundColor": "#FDF8F0"
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.lavacafe.app"
+      "bundleIdentifier": "com.sukarhelo.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png",
-        "backgroundColor": "#F7F3EE"
+        "backgroundColor": "#FDF8F0"
       },
-      "package": "com.lavacafe.app"
+      "package": "com.sukarhelo.app"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -38,7 +38,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F8F6F1",
+          "backgroundColor": "#FDF8F0",
           "image": "./assets/lava-icon.png",
           "imageWidth": 200
         }

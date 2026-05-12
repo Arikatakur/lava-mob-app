@@ -1,43 +1,43 @@
 /**
- * Lava Cafe — Centralized Color System
- * Green brand identity — fresh, premium, and natural.
+ * Sukar Helo — Centralized Color System
+ * Rich chocolate & dessert aesthetic — warm, premium, and indulgent.
  * Do NOT hardcode colors in components — use this file.
  */
 
 export const Colors = {
   // ── Backgrounds ──────────────────────────────────────────
-  backgroundPrimary: '#F8F6F1',      // warm cream canvas
-  backgroundSecondary: '#E8F0E4',    // light sage tint
+  backgroundPrimary: '#FDF8F0',      // warm cream canvas
+  backgroundSecondary: '#F5ECD7',    // soft caramel tint
 
   // ── Surfaces ─────────────────────────────────────────────
   surface: '#FFFFFF',
   surfaceCard: '#FFFFFF',
 
-  // ── Brand Greens ─────────────────────────────────────────
-  primaryBrown: '#5E7F57',           // primary Lava green (key kept for compatibility)
-  darkEspresso: '#3F5F3B',           // deep green
-  softMocha: '#A9BEA1',              // soft sage
+  // ── Brand Chocolates ─────────────────────────────────────
+  primaryBrown: '#7B4A2D',           // rich milk chocolate (primary brand)
+  darkEspresso: '#3D1C02',           // dark chocolate / espresso
+  softMocha: '#C8A882',              // warm mocha / latte
 
   // ── Warm Accents ─────────────────────────────────────────
-  warmBeige: '#C8D8C3',              // muted sage-warm
-  accentCaramel: '#C9A66B',          // gold accent
-  mutedGold: '#B89A5E',              // muted gold
+  warmBeige: '#E8D5B5',              // warm biscuit beige
+  accentCaramel: '#D4A843',          // gold caramel accent
+  mutedGold: '#B8874A',              // warm bronze gold
 
   // ── Text ─────────────────────────────────────────────────
-  textPrimary: '#243121',            // deep forest text
-  textSecondary: '#5E6B57',          // mid-tone green-grey
-  textMuted: '#7A8F63',              // muted olive
+  textPrimary: '#2C1A0E',            // deep chocolate text
+  textSecondary: '#6B4C2A',          // medium chocolate brown
+  textMuted: '#9B7B5A',              // warm mocha muted
   textInverse: '#FFFFFF',
 
   // ── Border & Divider ─────────────────────────────────────
-  border: '#D9E4D3',
-  divider: '#D9E4D3',
+  border: '#E8D5B5',
+  divider: '#EBD9BC',
 
   // ── Semantic ─────────────────────────────────────────────
   success: '#4D7C4A',
   error: '#B85C4B',
-  warning: '#C9A66B',
-  info: '#4E8D7C',
+  warning: '#D4A843',
+  info: '#7B9DBF',
 
   // ── Utility ──────────────────────────────────────────────
   white: '#FFFFFF',
@@ -45,12 +45,12 @@ export const Colors = {
   transparent: 'transparent',
 
   // ── Overlays ─────────────────────────────────────────────
-  overlayDark: 'rgba(36, 49, 33, 0.62)',
-  overlayLight: 'rgba(232, 240, 228, 0.88)',
+  overlayDark: 'rgba(44, 26, 14, 0.65)',
+  overlayLight: 'rgba(253, 248, 240, 0.90)',
 
   // ── Skeleton ─────────────────────────────────────────────
-  skeletonBase: '#E0EBD9',
-  skeletonHighlight: '#F0F5EC',
+  skeletonBase: '#ECD9BC',
+  skeletonHighlight: '#F5ECD7',
 } as const;
 
 export type ColorKey = keyof typeof Colors;

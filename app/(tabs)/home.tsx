@@ -108,7 +108,7 @@ export default function Home() {
 
   const greeting = profile?.full_name
     ? `${t.home.greeting}, ${profile.full_name.split(' ')[0]}!`
-    : `${t.home.greeting} ☕`;
+    : `${t.home.greeting} 🍫`;
 
   const handleAddToCart = (product: Product) => {
     addItem(product, 1, []);
@@ -179,7 +179,7 @@ export default function Home() {
         ) : (
           <View style={styles.heroBanner}>
             <View style={styles.heroContent}>
-              <Text style={styles.heroTag}>☕ {t.home.heroCoffee}</Text>
+              <Text style={styles.heroTag}>🍫 {t.home.heroDessert ?? t.home.heroCoffee}</Text>
               <Text style={styles.heroTitle}>{t.home.heroCrafted}</Text>
               <TouchableOpacity
                 style={styles.heroBtn}

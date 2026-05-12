@@ -1,5 +1,5 @@
 /**
- * Lava Cafe — Theme System Entry Point
+ * Sukar Helo — Theme System Entry Point
  * Import all theme tokens from here.
  */
 
@@ -21,3 +21,6 @@ export { Radius } from './radius';
 export type { RadiusKey } from './radius';
 
 export { Shadows } from './shadows';
+
+export { Gradients } from './gradients';
+export type { GradientKey } from './gradients';

@@ -46,7 +46,7 @@ import { useTranslation } from '../src/hooks/useTranslation';
 import type { OrderMode } from '../src/types';
 
 // ── Persistence key ───────────────────────────────────────────────
-const LAST_MODE_KEY = '@lava_last_order_mode';
+const LAST_MODE_KEY = '@sukarhelo_last_order_mode';
 
 // ── Mode config ───────────────────────────────────────────────────
 type ModeConfig = {
@@ -197,9 +197,9 @@ export default function OrderModeScreen() {
       {/* ── Brand mark ──────────────────────────────────────────── */}
       <Animated.View style={[styles.brandRow, { opacity: brand.opacity, transform: [{ translateY: brand.translateY }] }]}>
         <View style={styles.brandBadge}>
-          <Text style={styles.brandLetter} allowFontScaling={false}>L</Text>
+          <Text style={styles.brandLetter} allowFontScaling={false}>S</Text>
         </View>
-        <Text style={styles.brandName} allowFontScaling={false}>LAVA CAFE</Text>
+        <Text style={styles.brandName} allowFontScaling={false}>SUKAR HELO</Text>
       </Animated.View>
 
       {/* ── Headline ────────────────────────────────────────────── */}
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginEnd: 9,
     ...Platform.select({
-      ios:     { shadowColor: '#1B2E1A', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.18, shadowRadius: 10 },
+      ios:     { shadowColor: '#1A0A00', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.18, shadowRadius: 10 },
       android: { elevation: 5 },
     }),
   },
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing[4],
     paddingHorizontal: Spacing[4],
     ...Platform.select({
-      ios:     { shadowColor: '#1B2E1A', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.055, shadowRadius: 8 },
+      ios:     { shadowColor: '#1A0A00', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.055, shadowRadius: 8 },
       android: { elevation: 2 },
     }),
   },
@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.xl,
     paddingVertical: Spacing[4] + 2,
     ...Platform.select({
-      ios:     { shadowColor: '#1B2E1A', shadowOffset: { width: 0, height: 7 }, shadowOpacity: 0.24, shadowRadius: 16 },
+      ios:     { shadowColor: '#1A0A00', shadowOffset: { width: 0, height: 7 }, shadowOpacity: 0.24, shadowRadius: 16 },
       android: { elevation: 7 },
     }),
   },

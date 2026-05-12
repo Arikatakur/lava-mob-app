@@ -1,10 +1,10 @@
 /**
- * Lava Cafe — Shadow System
- * Warm, soft shadows matching the premium cafe aesthetic.
+ * Sukar Helo — Shadow System
+ * Warm, soft shadows matching the premium chocolate dessert aesthetic.
  */
 import { Platform } from 'react-native';
 
-const shadowColor = '#243121';
+const shadowColor = '#2C1A0E';
 
 export const Shadows = {
   none: {},
@@ -42,7 +42,7 @@ export const Shadows = {
     ios: {
       shadowColor,
       shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.12,
+      shadowOpacity: 0.13,
       shadowRadius: 20,
     },
     android: { elevation: 8 },
@@ -52,7 +52,7 @@ export const Shadows = {
     ios: {
       shadowColor,
       shadowOffset: { width: 0, height: 12 },
-      shadowOpacity: 0.15,
+      shadowOpacity: 0.16,
       shadowRadius: 28,
     },
     android: { elevation: 12 },
