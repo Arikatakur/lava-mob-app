@@ -6,6 +6,21 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 
 ---
 
+## v2.1.1 - 2026-05-12
+
+### Changed
+- **Order mode screen** — polished to App Store-level premium UX:
+  - Tighter vertical rhythm; CTA button sits close to selection cards, no dead space.
+  - Three ambient glow circles (caramel top-right, mocha bottom-left, soft center) add depth without flat areas.
+  - Cards are taller (`paddingVertical` +4px), rest with softer shadow, lift with elevated shadow when selected.
+  - Selected state uses warm gold (`accentCaramel`) border + subtle gold inner glow overlay + dark espresso icon badge shadow.
+  - Spring-pulse scale animation fires on card selection (1.0 → 1.03 → 1.0).
+  - Press feedback tightened (scale 0.965, no bounce).
+  - CTA button: active state is floating with strong shadow (`shadowOpacity 0.32`, `elevation 10`); disabled state is flat warm beige — clearly distinct.
+  - Subline bumped to `FontSize.base` for better readability.
+
+---
+
 ## v2.1.0 - 2026-05-12
 
 ### Added
