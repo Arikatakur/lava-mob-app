@@ -1,120 +1,157 @@
-import React, { useRef, useState } from 'react';
+/**
+ * Welcome screen — Sukar Helo branded entry point.
+ *
+ * Replaces the multi-slide carousel with a single premium screen:
+ *   logo + brand name + subtitle → Sign In / Continue as Guest
+ *
+ * Animation sequence
+ * ──────────────────
+ *  Background glow  – immediate
+ *  Logo             – spring scale 0.8→1 + fade,  delay   0 ms
+ *  Brand + subtitle – slide-up + fade,             delay 180 ms
+ *  Buttons          – slide-up + fade,             delay 340 ms
+ */
+
+import React, { useEffect, useRef } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  FlatList,
-  TouchableOpacity,
   Animated,
+  Dimensions,
+  Image,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { router } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button } from '../src/components/ui/Button';
 import { useTranslation } from '../src/hooks/useTranslation';
-import { Colors, FontFamily, FontSize, Radius, Spacing } from '../src/theme';
+import { Colors, FontFamily, FontSize, Radius, Spacing, Shadows } from '../src/theme';
 import { useAuthStore } from '../src/store/useAuthStore';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
+const LOGO_SIZE = Math.min(width * 0.62, 260);
 
-const SLIDES = [
-  {
-    key: 'slide1',
-    icon: 'local-cafe' as const,
-    bgColor: Colors.darkEspresso,
-    accentColor: Colors.accentCaramel,
-  },
-  {
-    key: 'slide2',
-    icon: 'shopping-bag' as const,
-    bgColor: Colors.primaryBrown,
-    accentColor: Colors.mutedGold,
-  },
-  {
-    key: 'slide3',
-    icon: 'star' as const,
-    bgColor: Colors.softMocha,
-    accentColor: Colors.warmBeige,
-  },
-];
+function useEntrance(delay: number) {
+  const opacity    = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(18)).current;
 
-export default function Onboarding() {
-  const { t } = useTranslation();
-  const [activeIndex, setActiveIndex] = useState(0);
-  const flatListRef = useRef<FlatList>(null);
-  const { setGuest } = useAuthStore();
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 520,
+        delay,
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 460,
+        delay,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
 
-  const slideData = SLIDES.map((s, i) => ({
-    ...s,
-    title: i === 0 ? t.onboarding.slide1Title : i === 1 ? t.onboarding.slide2Title : t.onboarding.slide3Title,
-    subtitle: i === 0 ? t.onboarding.slide1Subtitle : i === 1 ? t.onboarding.slide2Subtitle : t.onboarding.slide3Subtitle,
-  }));
+  return { opacity, translateY };
+}
 
-  const isLast = activeIndex === SLIDES.length - 1;
+export default function Welcome() {
+  const { t, isRTL } = useTranslation();
+  const { setGuest }  = useAuthStore();
 
-  const handleNext = () => {
-    if (isLast) {
-      router.push('/(auth)/login');
-    } else {
-      flatListRef.current?.scrollToIndex({ index: activeIndex + 1 });
-    }
-  };
+  const logoOpacity = useRef(new Animated.Value(0)).current;
+  const logoScale   = useRef(new Animated.Value(0.82)).current;
+  const brand       = useEntrance(180);
+  const buttons     = useEntrance(340);
 
-  const handleGuest = () => {
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(logoOpacity, {
+        toValue: 1,
+        duration: 480,
+        useNativeDriver: true,
+      }),
+      Animated.spring(logoScale, {
+        toValue: 1,
+        tension: 60,
+        friction: 8,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  const handleSignIn = () => router.push('/(auth)/login');
+  const handleGuest  = () => {
     setGuest(true);
     router.replace('/(tabs)/home');
   };
 
   return (
     <SafeAreaView style={styles.safe}>
-      <FlatList
-        ref={flatListRef}
-        data={slideData}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.key}
-        onMomentumScrollEnd={(e) => {
-          const idx = Math.round(e.nativeEvent.contentOffset.x / width);
-          setActiveIndex(idx);
-        }}
-        renderItem={({ item }) => (
-          <View style={[styles.slide, { backgroundColor: item.bgColor }]}>
-            <View style={[styles.iconCircle, { backgroundColor: item.accentColor + '30' }]}>
-              <MaterialIcons name={item.icon} size={80} color={item.accentColor} />
-            </View>
-            <Text style={styles.slideTitle}>{item.title}</Text>
-            <Text style={styles.slideSubtitle}>{item.subtitle}</Text>
-          </View>
-        )}
-      />
 
-      {/* Dots */}
-      <View style={styles.dots}>
-        {SLIDES.map((_, i) => (
-          <View
-            key={i}
-            style={[
-              styles.dot,
-              activeIndex === i ? styles.dotActive : styles.dotInactive,
-            ]}
+      {/* ── Ambient background glows ─────────────────────────── */}
+      <View style={styles.glowTop} />
+      <View style={styles.glowBottom} />
+
+      {/* ── Logo ─────────────────────────────────────────────── */}
+      <View style={styles.logoSection}>
+        <Animated.View
+          style={{
+            opacity:   logoOpacity,
+            transform: [{ scale: logoScale }],
+          }}
+        >
+          <Image
+            source={require('../assets/sukar-helo.png')}
+            style={styles.logo}
+            resizeMode="contain"
           />
-        ))}
+        </Animated.View>
       </View>
 
-      {/* Actions */}
-      <View style={styles.actions}>
-        <Button
-          label={isLast ? t.onboarding.getStarted : t.common.next}
-          onPress={handleNext}
-          fullWidth
-          size="lg"
-        />
-        <TouchableOpacity onPress={handleGuest} style={styles.guestBtn}>
+      {/* ── Brand name + subtitle ────────────────────────────── */}
+      <Animated.View
+        style={[
+          styles.brandSection,
+          { opacity: brand.opacity, transform: [{ translateY: brand.translateY }] },
+        ]}
+      >
+        <Text style={styles.brandName} allowFontScaling={false}>SUKAR HELO</Text>
+        <Text style={[styles.subtitle, isRTL && styles.rtlText]}>
+          {t.onboarding.welcomeSubtitle}
+        </Text>
+      </Animated.View>
+
+      {/* ── Spacer ───────────────────────────────────────────── */}
+      <View style={styles.spacer} />
+
+      {/* ── Buttons ──────────────────────────────────────────── */}
+      <Animated.View
+        style={[
+          styles.actions,
+          { opacity: buttons.opacity, transform: [{ translateY: buttons.translateY }] },
+        ]}
+      >
+        {/* Primary: Sign In */}
+        <TouchableOpacity
+          style={styles.signInBtn}
+          onPress={handleSignIn}
+          activeOpacity={0.84}
+        >
+          <Text style={styles.signInText}>{t.auth.signIn}</Text>
+        </TouchableOpacity>
+
+        {/* Secondary: Continue as Guest */}
+        <TouchableOpacity
+          style={styles.guestBtn}
+          onPress={handleGuest}
+          activeOpacity={0.65}
+        >
           <Text style={styles.guestText}>{t.auth.guest}</Text>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
+
     </SafeAreaView>
   );
 }
@@ -122,67 +159,114 @@ export default function Onboarding() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: Colors.darkEspresso,
+    backgroundColor: Colors.backgroundPrimary,
+    paddingHorizontal: Spacing[6],
+    paddingBottom: Spacing[8],
   },
-  slide: {
-    width,
+
+  // Ambient glow circles
+  glowTop: {
+    position: 'absolute',
+    width: 280,
+    height: 280,
+    borderRadius: 140,
+    backgroundColor: Colors.accentCaramel,
+    opacity: 0.06,
+    top: -80,
+    right: -60,
+  },
+  glowBottom: {
+    position: 'absolute',
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    backgroundColor: Colors.primaryBrown,
+    opacity: 0.07,
+    bottom: 60,
+    left: -70,
+  },
+
+  // Logo
+  logoSection: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: Spacing[8],
+    minHeight: LOGO_SIZE + 40,
   },
-  iconCircle: {
-    width: 160,
-    height: 160,
-    borderRadius: 80,
+  logo: {
+    width: LOGO_SIZE,
+    height: LOGO_SIZE,
+    ...Platform.select({
+      ios: {
+        shadowColor: Colors.darkEspresso,
+        shadowOffset: { width: 0, height: 12 },
+        shadowOpacity: 0.12,
+        shadowRadius: 24,
+      },
+    }),
+  },
+
+  // Brand
+  brandSection: {
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: Spacing[10],
+    paddingBottom: Spacing[2],
   },
-  slideTitle: {
-    fontFamily: FontFamily.bold,
-    fontSize: FontSize['3xl'],
-    color: Colors.white,
-    textAlign: 'center',
-    marginBottom: Spacing[4],
-    lineHeight: 36,
+  brandName: {
+    fontFamily: FontFamily.semiBold,
+    fontSize: FontSize.sm,
+    letterSpacing: 5,
+    color: Colors.darkEspresso,
+    marginBottom: Spacing[3],
   },
-  slideSubtitle: {
+  subtitle: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.base,
-    color: 'rgba(255,255,255,0.75)',
+    color: Colors.textSecondary,
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: FontSize.base * 1.65,
+    paddingHorizontal: Spacing[4],
   },
-  dots: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingVertical: Spacing[5],
-    backgroundColor: Colors.darkEspresso,
+  rtlText: {
+    textAlign: 'center',
+    writingDirection: 'rtl',
   },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 4,
-  },
-  dotActive: {
-    backgroundColor: Colors.accentCaramel,
-    width: 24,
-  },
-  dotInactive: {
-    backgroundColor: 'rgba(255,255,255,0.3)',
-  },
+
+  spacer: { flex: 0.5 },
+
+  // Buttons
   actions: {
-    backgroundColor: Colors.backgroundPrimary,
-    paddingHorizontal: Spacing[5],
-    paddingTop: Spacing[5],
-    paddingBottom: Spacing[8],
     gap: Spacing[3],
+  },
+  signInBtn: {
+    backgroundColor: Colors.darkEspresso,
+    borderRadius: Radius.xl,
+    paddingVertical: Spacing[4] + 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#1A0A00',
+        shadowOffset: { width: 0, height: 7 },
+        shadowOpacity: 0.22,
+        shadowRadius: 16,
+      },
+      android: { elevation: 7 },
+    }),
+  },
+  signInText: {
+    fontFamily: FontFamily.semiBold,
+    fontSize: FontSize.base,
+    color: Colors.backgroundPrimary,
+    letterSpacing: 0.3,
   },
   guestBtn: {
     alignItems: 'center',
-    paddingVertical: Spacing[3],
+    justifyContent: 'center',
+    paddingVertical: Spacing[3] + 2,
+    borderRadius: Radius.xl,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    backgroundColor: 'transparent',
   },
   guestText: {
     fontFamily: FontFamily.medium,

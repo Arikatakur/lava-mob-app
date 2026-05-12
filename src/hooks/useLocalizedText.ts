@@ -10,7 +10,8 @@ export function useLocalizedText() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function localize(obj: Record<string, any>, field: string): string {
     const localizedKey = `${field}_${language}`;
-    const fallbackKey = `${field}_${language === 'he' ? 'en' : 'he'}`;
+    const fallbackLang = language === 'he' ? 'en' : language === 'ar' ? 'en' : 'he';
+    const fallbackKey = `${field}_${fallbackLang}`;
     const val = obj[localizedKey] ?? obj[fallbackKey];
     return typeof val === 'string' ? val : '';
   }

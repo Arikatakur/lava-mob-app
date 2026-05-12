@@ -6,6 +6,28 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 
 ---
 
+## v2.1.0 - 2026-05-12
+
+### Added
+- **Arabic language support** — full `src/locales/ar.ts` with complete translations across all screens.
+- Arabic added to `Language` type (`'he' | 'en' | 'ar'`).
+- Arabic set as the **default app language** (RTL).
+- `onboarding.welcomeSubtitle` locale key added to `en`, `he`, and `ar`.
+- `settings.arabic` locale key added to all three locales.
+
+### Changed
+- **Onboarding screen** fully redesigned — replaced 3-slide carousel with a single premium welcome screen:
+  - Centered `sukar-helo.png` logo with spring scale entrance animation.
+  - `SUKAR HELO` wordmark + localized subtitle.
+  - Primary "Sign In" button and subtle bordered "Continue as Guest" button.
+  - Staggered fade + slide-up entrance animations.
+  - Soft ambient glow background accents.
+- `useAppStore` default language changed from `'he'` to `'ar'`; `setLanguage` now marks Arabic as RTL.
+- `useLocalizedText` fallback for Arabic now resolves to English (not Hebrew) for DB content fields.
+- Profile screen language toggle replaced binary Switch with a **tap-to-cycle badge** (AR → HE → EN → AR).
+
+---
+
 ## v2.0.0 - 2026-05-12
 
 ### Changed

@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  Switch,
 } from 'react-native';
 import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -102,9 +101,11 @@ export default function Profile() {
     );
   };
 
-  const toggleLanguage = () => {
-    setLanguage(language === 'he' ? 'en' : 'he');
+  const cycleLanguage = () => {
+    setLanguage(language === 'ar' ? 'he' : language === 'he' ? 'en' : 'ar');
   };
+
+  const langLabel = language === 'ar' ? 'ع' : language === 'he' ? 'עב' : 'EN';
 
   const displayName = profile?.full_name ?? user?.email ?? 'Guest';
   const isGuest = !user;
@@ -214,17 +215,13 @@ export default function Profile() {
               label={t.settings.language}
               isRTL={isRTL}
               rightElement={
-                <View style={[styles.langToggle, isRTL && styles.rtl]}>
-                  <Text style={styles.langText}>
-                    {language === 'he' ? 'עב' : 'EN'}
-                  </Text>
-                  <Switch
-                    value={language === 'en'}
-                    onValueChange={toggleLanguage}
-                    trackColor={{ false: Colors.primaryBrown, true: Colors.accentCaramel }}
-                    thumbColor={Colors.white}
-                  />
-                </View>
+                <TouchableOpacity
+                  style={styles.langBadge}
+                  onPress={cycleLanguage}
+                  activeOpacity={0.75}
+                >
+                  <Text style={styles.langText}>{langLabel}</Text>
+                </TouchableOpacity>
               }
             />
           </View>
@@ -388,15 +385,20 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
   rtl: { flexDirection: 'row-reverse' },
-  langToggle: {
-    flexDirection: 'row',
+  langBadge: {
+    paddingHorizontal: Spacing[3],
+    paddingVertical: Spacing[1] + 2,
+    borderRadius: Radius.full,
+    backgroundColor: Colors.backgroundSecondary,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    minWidth: 40,
     alignItems: 'center',
-    gap: Spacing[2],
   },
   langText: {
-    fontFamily: FontFamily.medium,
+    fontFamily: FontFamily.semiBold,
     fontSize: FontSize.sm,
-    color: Colors.textSecondary,
+    color: Colors.textPrimary,
   },
   authSection: { paddingHorizontal: Spacing[5], marginBottom: Spacing[4] },
   versionRow: { alignItems: 'center', paddingBottom: Spacing[8] },

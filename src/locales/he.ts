@@ -57,6 +57,7 @@ export const he = {
     slide3Subtitle: 'הצטרף לתכנית הנאמנות שלנו וצבור נקודות מתוקות',
     getStarted: 'בואו נתחיל',
     skip: 'דלג',
+    welcomeSubtitle: 'קינוחים ושוקולד פרמיום מוכנים עם אהבה',
   },
   home: {
     title: 'בית',
@@ -200,6 +201,7 @@ export const he = {
     language: 'שפה',
     hebrew: 'עברית',
     english: 'English',
+    arabic: 'العربية',
     notifications: 'התראות',
     orderUpdates: 'עדכוני הזמנות',
     promotions: 'מבצעים',

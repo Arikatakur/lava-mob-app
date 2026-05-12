@@ -21,9 +21,9 @@ interface AppState {
 
 export const useAppStore = create<AppState>((set) => ({
   // Language
-  language: 'he',
+  language: 'ar',
   isRTL: true,
-  setLanguage: (lang) => set({ language: lang, isRTL: lang === 'he' }),
+  setLanguage: (lang) => set({ language: lang, isRTL: lang === 'he' || lang === 'ar' }),
 
   // Order mode — always starts as null / not-selected each launch
   orderMode: null,

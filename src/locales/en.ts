@@ -57,6 +57,7 @@ export const en = {
     slide3Subtitle: 'Join our loyalty program and earn sweet points',
     getStarted: "Let's Get Started",
     skip: 'Skip',
+    welcomeSubtitle: 'Premium desserts & chocolate crafted with love',
   },
   home: {
     title: 'Home',
@@ -201,6 +202,7 @@ export const en = {
     language: 'Language',
     hebrew: 'עברית',
     english: 'English',
+    arabic: 'العربية',
     notifications: 'Notifications',
     orderUpdates: 'Order Updates',
     promotions: 'Promotions',
