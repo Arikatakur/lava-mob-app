@@ -5,7 +5,7 @@
 export type Language = 'he' | 'en' | 'ar';
 
 /** How the customer intends to receive their order this session. */
-export type OrderMode = 'delivery' | 'pickup' | 'dine_in';
+export type OrderMode = 'delivery' | 'pickup';
 
 export interface Category {
   id: string;

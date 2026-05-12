@@ -23,12 +23,10 @@ import type { OrderMode } from '../../src/types';
 const MODE_ICON: Record<OrderMode, keyof typeof MaterialIcons.glyphMap> = {
   delivery: 'delivery-dining',
   pickup:   'storefront',
-  dine_in:  'restaurant',
 };
-const MODE_LABEL_KEY: Record<OrderMode, 'delivery' | 'pickup' | 'dineIn'> = {
+const MODE_LABEL_KEY: Record<OrderMode, 'delivery' | 'pickup'> = {
   delivery: 'delivery',
   pickup:   'pickup',
-  dine_in:  'dineIn',
 };
 
 export default function Cart() {

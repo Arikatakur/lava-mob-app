@@ -30,7 +30,6 @@ type PaymentMethod = 'native_pay' | 'credit_card' | 'cash';
 const MODE_ICON: Record<OrderMode, keyof typeof MaterialIcons.glyphMap> = {
   delivery: 'delivery-dining',
   pickup:   'storefront',
-  dine_in:  'restaurant',
 };
 
 function formatCardNumber(value: string) {
@@ -58,14 +57,10 @@ export default function Checkout() {
 
   // Cash label depends on the active fulfillment mode
   const cashLabel =
-    orderMode === 'delivery' ? t.checkout.cashDelivery :
-    orderMode === 'dine_in'  ? t.checkout.cashDineIn   :
-    t.checkout.cash;
+    orderMode === 'delivery' ? t.checkout.cashDelivery : t.checkout.cash;
 
   // Mode label for the fulfillment section header
-  const modeLabelKey =
-    orderMode === 'delivery' ? 'delivery' :
-    orderMode === 'dine_in'  ? 'dineIn'   : 'pickup';
+  const modeLabelKey = orderMode === 'delivery' ? 'delivery' : 'pickup';
 
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);

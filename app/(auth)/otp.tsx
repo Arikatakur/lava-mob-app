@@ -72,7 +72,7 @@ export default function Otp() {
           phone,
         });
         setProfile(profile);
-        router.replace('/(tabs)/home');
+        router.replace('/order-mode');
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : 'Something went wrong');
       } finally {
@@ -96,7 +96,7 @@ export default function Otp() {
       const profile = await authService.getProfile(user.id);
       if (profile?.full_name) {
         setProfile(profile);
-        router.replace('/(tabs)/home');
+        router.replace('/order-mode');
       } else {
         // New user — collect name
         setVerifiedUser(user);

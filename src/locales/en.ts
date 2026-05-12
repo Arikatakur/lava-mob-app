@@ -256,8 +256,6 @@ export const en = {
     deliverySub: "We'll bring it to your door",
     pickup: 'Pickup',
     pickupSub: 'Order ahead, collect at store',
-    dineIn: 'Dine-in',
-    dineInSub: 'Enjoy it here with us',
     continueBtn: 'Continue',
   },
 };

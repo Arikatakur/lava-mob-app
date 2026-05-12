@@ -255,8 +255,6 @@ export const ar = {
     deliverySub: 'سنوصله إلى بابك',
     pickup: 'استلام',
     pickupSub: 'اطلب مسبقاً واستلم من المتجر',
-    dineIn: 'تناول في المكان',
-    dineInSub: 'استمتع بتناول الطعام هنا',
     continueBtn: 'متابعة',
   },
 };

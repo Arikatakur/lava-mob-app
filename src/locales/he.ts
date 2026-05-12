@@ -255,8 +255,6 @@ export const he = {
     deliverySub: 'נביא אליך עד הבית',
     pickup: 'איסוף עצמי',
     pickupSub: 'הזמן מראש ואסוף מהסניף',
-    dineIn: 'ישיבה במקום',
-    dineInSub: 'אוכל במקום',
     continueBtn: 'המשך',
   },
 };

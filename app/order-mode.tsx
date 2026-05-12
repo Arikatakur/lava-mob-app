@@ -16,8 +16,7 @@
  *  Headline    – fade + slide-up, delay  60 ms
  *  Card 1      – fade + slide-up, delay 130 ms
  *  Card 2      – fade + slide-up, delay 210 ms
- *  Card 3      – fade + slide-up, delay 290 ms
- *  Button      – fade + slide-up, delay 350 ms
+ *  Button      – fade + slide-up, delay 290 ms
  */
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -55,14 +54,13 @@ const LAST_MODE_KEY = '@sukarhelo_last_order_mode';
 type ModeConfig = {
   key: OrderMode;
   icon: keyof typeof MaterialIcons.glyphMap;
-  labelKey: 'delivery' | 'pickup' | 'dineIn';
-  subKey:   'deliverySub' | 'pickupSub' | 'dineInSub';
+  labelKey: 'delivery' | 'pickup';
+  subKey:   'deliverySub' | 'pickupSub';
 };
 
 const MODES: ModeConfig[] = [
   { key: 'delivery', icon: 'delivery-dining', labelKey: 'delivery', subKey: 'deliverySub' },
   { key: 'pickup',   icon: 'storefront',      labelKey: 'pickup',   subKey: 'pickupSub'   },
-  { key: 'dine_in',  icon: 'restaurant',      labelKey: 'dineIn',   subKey: 'dineInSub'   },
 ];
 
 // ── Entrance hook ─────────────────────────────────────────────────
@@ -202,8 +200,8 @@ export default function OrderModeScreen() {
 
   const brand    = useEntrance(0);
   const headline = useEntrance(60);
-  const cards    = [useEntrance(130), useEntrance(210), useEntrance(290)];
-  const btn      = useEntrance(350);
+  const cards    = [useEntrance(130), useEntrance(210)];
+  const btn      = useEntrance(290);
 
   const handleContinue = () => {
     if (!selected) return;

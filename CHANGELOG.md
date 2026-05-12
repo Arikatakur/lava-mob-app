@@ -6,6 +6,21 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 
 ---
 
+## v2.2.0 - 2026-05-12
+
+### Changed
+- **Post-login navigation** — after OTP verification (both new and returning users), app navigates to `/order-mode` instead of `/(tabs)/home`.
+- **Order type selection** reduced to two options: **Delivery** and **Pickup**. Dine-in removed entirely.
+
+### Removed
+- `dine_in` value from `OrderMode` type (`src/types/index.ts`).
+- `dineIn` / `dineInSub` keys from `orderMode` section in all three locales (`en`, `he`, `ar`).
+- `dine_in` entries from `MODE_ICON` and `MODE_LABEL_KEY` records in `cart.tsx` and `checkout/index.tsx`.
+- `cashDineIn` branch from checkout cash-label logic.
+- Third card entrance animation (Card 3 / 290 ms delay) from order-mode screen.
+
+---
+
 ## v2.1.1 - 2026-05-12
 
 ### Changed
