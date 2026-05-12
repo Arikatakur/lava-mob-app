@@ -5,6 +5,7 @@ node_modules/
 
 # Claude
 .claude/
+claude.md
 
 # Expo
 .expo/
@@ -44,3 +45,8 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+.fake
+
+# rework
+lava-rework
