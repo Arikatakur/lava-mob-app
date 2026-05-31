@@ -2,7 +2,7 @@
   "expo": {
     "name": "Sukar Helo",
     "slug": "sukar-helo",
-    "version": "2.0.0",
+    "version": "2.3.0",
     "orientation": "portrait",
     "icon": "./assets/lava-icon.png",
     "userInterfaceStyle": "light",
@@ -14,7 +14,8 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.sukarhelo.app"
+      "bundleIdentifier": "org.clientvault.sukarhelo",
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
@@ -23,7 +24,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png",
         "backgroundColor": "#FDF8F0"
       },
-      "package": "com.sukarhelo.app"
+      "package": "org.clientvault.sukarhelo"
     },
     "web": {
       "favicon": "./assets/favicon.png",
