@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   RefreshControl,
+  useWindowDimensions,
 } from 'react-native';
 import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -22,8 +23,12 @@ import { useFeaturedProducts, useCategories, useBanners, useProducts } from '../
 import { useCartStore } from '../../src/store/useCartStore';
 import { useFavoritesStore } from '../../src/store/useFavoritesStore';
 import { useAuthStore } from '../../src/store/useAuthStore';
-import { Colors, FontFamily, FontSize, Spacing, Radius, Shadows } from '../../src/theme';
+import { Colors, FontFamily, FontSize, Spacing, Radius, Shadows, Layout } from '../../src/theme';
 import type { Product } from '../../src/types';
+
+const CARD_GAP = Layout.cardGap;            // 12
+const SCREEN_PAD = Layout.screenPaddingHorizontal; // 16
+const CAROUSEL_PEEK = 40;                   // px of third card visible — intentional, not awkward
 
 function getTierLabel(points: number, t: ReturnType<typeof useTranslation>['t']) {
   if (points >= 1000) return t.rewards.gold;
@@ -32,9 +37,9 @@ function getTierLabel(points: number, t: ReturnType<typeof useTranslation>['t'])
 }
 
 function getTierColor(points: number) {
-  if (points >= 1000) return Colors.accentCaramel;    // gold
-  if (points >= 500) return Colors.softMocha;         // sage silver
-  return Colors.mutedGold;                            // warm bronze-gold
+  if (points >= 1000) return Colors.accentCaramel;
+  if (points >= 500) return Colors.softMocha;
+  return Colors.mutedGold;
 }
 
 function LoyaltyCard({ points, isRTL, t }: {
@@ -65,8 +70,12 @@ function LoyaltyCard({ points, isRTL, t }: {
             <MaterialIcons name="star" size={12} color={tierColor} />
             <Text style={[styles.loyaltyTierText, { color: tierColor }]}>{tier}</Text>
           </View>
-          <Text style={styles.loyaltyPoints}>{points.toLocaleString()}</Text>
-          <Text style={styles.loyaltyPointsLabel}>{t.home.yourPoints}</Text>
+          <Text style={[styles.loyaltyPoints, isRTL && styles.alignRight]}>
+            {points.toLocaleString()}
+          </Text>
+          <Text style={[styles.loyaltyPointsLabel, isRTL && styles.alignRight]}>
+            {t.home.yourPoints}
+          </Text>
           {nextLabel && nextPts && (
             <View style={styles.loyaltyProgressWrap}>
               <View style={styles.loyaltyProgressBar}>
@@ -75,7 +84,7 @@ function LoyaltyCard({ points, isRTL, t }: {
                   backgroundColor: tierColor,
                 }]} />
               </View>
-              <Text style={styles.loyaltyProgressLabel}>
+              <Text style={[styles.loyaltyProgressLabel, isRTL && styles.alignRight]}>
                 {nextPts - points} {t.profile.ptsTo} {nextLabel}
               </Text>
             </View>
@@ -98,16 +107,21 @@ export default function Home() {
   const { profile, user } = useAuthStore();
   const { addItem } = useCartStore();
   const { isFavorite, toggle } = useFavoritesStore();
+  const { width: screenW } = useWindowDimensions();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
+
+  // Carousel card width: 2 full cards + small peek of the third — intentional, never squished
+  const carouselCardWidth = Math.floor((screenW - SCREEN_PAD * 2 - CARD_GAP - CAROUSEL_PEEK) / 2);
 
   const { banners, loading: bannersLoading } = useBanners();
   const { categories } = useCategories();
   const { products: featured, loading: featuredLoading } = useFeaturedProducts();
   const { products: menuProducts, loading: menuLoading } = useProducts(selectedCategory !== 'all' ? selectedCategory : undefined);
 
-  const greeting = profile?.full_name
-    ? `${t.home.greeting}, ${profile.full_name.split(' ')[0]}!`
+  const firstName = profile?.full_name?.split(' ')[0];
+  const greeting = firstName
+    ? `${t.home.greeting} ${firstName}!`
     : `${t.home.greeting} 🍫`;
 
   const handleAddToCart = (product: Product) => {
@@ -115,9 +129,21 @@ export default function Home() {
   };
 
   const allCategories = [
-    { id: 'all', name_en: 'All', name_he: 'הכל', slug: 'all', sort_order: 0, is_active: true },
+    { id: 'all', name_en: t.common.all, name_he: t.common.all, name_ar: t.common.all, slug: 'all', sort_order: 0, is_active: true },
     ...categories,
   ];
+
+  const renderCarouselCard = ({ item }: { item: Product }) => (
+    <ProductCard
+      product={item}
+      localizedName={localize(item, 'name')}
+      onPress={() => router.push(`/product/${item.id}`)}
+      onAddToCart={() => handleAddToCart(item)}
+      isFavorite={isFavorite(item.id)}
+      onToggleFavorite={() => toggle(item.id)}
+      width={carouselCardWidth}
+    />
+  );
 
   return (
     <ScreenWrapper>
@@ -133,9 +159,13 @@ export default function Home() {
       >
         {/* Top Bar */}
         <View style={[styles.topBar, isRTL && styles.rtl]}>
-          <View>
-            <Text style={styles.greeting}>{greeting}</Text>
-            <Text style={styles.subGreeting}>{t.home.whatToday}</Text>
+          <View style={styles.topBarText}>
+            <Text style={[styles.greeting, isRTL && styles.alignRight]} numberOfLines={1}>
+              {greeting}
+            </Text>
+            <Text style={[styles.subGreeting, isRTL && styles.alignRight]} numberOfLines={1}>
+              {t.home.whatToday}
+            </Text>
           </View>
           <TouchableOpacity
             style={styles.searchBtn}
@@ -200,6 +230,7 @@ export default function Home() {
             showsHorizontalScrollIndicator={false}
             keyExtractor={(c) => c.id}
             contentContainerStyle={styles.categoriesList}
+            ItemSeparatorComponent={() => <View style={{ width: Spacing[2] }} />}
             renderItem={({ item }) => (
               <CategoryChip
                 label={localize(item, 'name')}
@@ -225,7 +256,8 @@ export default function Home() {
               showsHorizontalScrollIndicator={false}
               keyExtractor={(i) => String(i)}
               contentContainerStyle={styles.productsList}
-              renderItem={() => <ProductCardSkeleton />}
+              ItemSeparatorComponent={() => <View style={{ width: CARD_GAP }} />}
+              renderItem={() => <ProductCardSkeleton width={carouselCardWidth} />}
             />
           ) : (
             <FlatList
@@ -234,16 +266,8 @@ export default function Home() {
               showsHorizontalScrollIndicator={false}
               keyExtractor={(p) => p.id}
               contentContainerStyle={styles.productsList}
-              renderItem={({ item }) => (
-                <ProductCard
-                  product={item}
-                  localizedName={localize(item, 'name')}
-                  onPress={() => router.push(`/product/${item.id}`)}
-                  onAddToCart={() => handleAddToCart(item)}
-                  isFavorite={isFavorite(item.id)}
-                  onToggleFavorite={() => toggle(item.id)}
-                />
-              )}
+              ItemSeparatorComponent={() => <View style={{ width: CARD_GAP }} />}
+                renderItem={renderCarouselCard}
             />
           )}
         </View>
@@ -255,9 +279,15 @@ export default function Home() {
             isRTL={isRTL}
           />
           {menuLoading ? (
-            <View style={styles.gridSkeleton}>
-              {[1, 2, 3, 4].map((i) => <ProductCardSkeleton key={i} />)}
-            </View>
+            <FlatList
+              data={[1, 2, 3]}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(i) => String(i)}
+              contentContainerStyle={styles.productsList}
+              ItemSeparatorComponent={() => <View style={{ width: CARD_GAP }} />}
+              renderItem={() => <ProductCardSkeleton width={carouselCardWidth} />}
+            />
           ) : (
             <FlatList
               data={menuProducts}
@@ -265,16 +295,8 @@ export default function Home() {
               showsHorizontalScrollIndicator={false}
               keyExtractor={(p) => p.id}
               contentContainerStyle={styles.productsList}
-              renderItem={({ item }) => (
-                <ProductCard
-                  product={item}
-                  localizedName={localize(item, 'name')}
-                  onPress={() => router.push(`/product/${item.id}`)}
-                  onAddToCart={() => handleAddToCart(item)}
-                  isFavorite={isFavorite(item.id)}
-                  onToggleFavorite={() => toggle(item.id)}
-                />
-              )}
+              ItemSeparatorComponent={() => <View style={{ width: CARD_GAP }} />}
+                renderItem={renderCarouselCard}
             />
           )}
         </View>
@@ -288,11 +310,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: Spacing[5],
+    paddingHorizontal: SCREEN_PAD,
     paddingTop: Spacing[4],
     paddingBottom: Spacing[3],
+    gap: Spacing[3],
   },
+  topBarText: { flex: 1 },
   rtl: { flexDirection: 'row-reverse' },
+  alignRight: { textAlign: 'right' },
   greeting: {
     fontFamily: FontFamily.bold,
     fontSize: FontSize['2xl'],
@@ -315,7 +340,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
   },
   loyaltySection: {
-    paddingHorizontal: Spacing[5],
+    paddingHorizontal: SCREEN_PAD,
     marginBottom: Spacing[2],
   },
   loyaltyCard: {
@@ -401,11 +426,11 @@ const styles = StyleSheet.create({
     maxWidth: 60,
   },
   bannersContainer: {
-    paddingHorizontal: Spacing[5],
+    paddingHorizontal: SCREEN_PAD,
     paddingBottom: Spacing[4],
   },
   heroBanner: {
-    marginHorizontal: Spacing[5],
+    marginHorizontal: SCREEN_PAD,
     height: 180,
     borderRadius: Radius.xl,
     backgroundColor: Colors.darkEspresso,
@@ -441,8 +466,7 @@ const styles = StyleSheet.create({
     color: Colors.white,
   },
   sectionGap: { marginTop: Spacing[6] },
-  categoriesList: { paddingHorizontal: Spacing[5] },
-  productsList: { paddingHorizontal: Spacing[5] },
-  gridSkeleton: { flexDirection: 'row', paddingHorizontal: Spacing[5], gap: Spacing[3] },
+  categoriesList: { paddingHorizontal: SCREEN_PAD },
+  productsList: { paddingHorizontal: SCREEN_PAD },
   bottomPad: { marginBottom: Spacing[8] },
 });

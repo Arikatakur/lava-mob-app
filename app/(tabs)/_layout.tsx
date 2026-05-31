@@ -1,10 +1,28 @@
 import { Tabs } from 'expo-router';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCartStore } from '../../src/store/useCartStore';
 import { useTranslation } from '../../src/hooks/useTranslation';
 import { useAuthStore } from '../../src/store/useAuthStore';
-import { Colors, FontFamily, FontSize, Shadows } from '../../src/theme';
+import { Colors, FontFamily, FontSize, Shadows, Spacing } from '../../src/theme';
+
+const ICON_WRAP_W = 56;
+const ICON_WRAP_H = 32;
+
+function TabIconWrap({
+  children,
+  focused,
+}: {
+  children: React.ReactNode;
+  focused: boolean;
+}) {
+  return (
+    <View style={[styles.iconWrap, focused && styles.iconWrapFocused]}>
+      {children}
+    </View>
+  );
+}
 
 function TabIcon({
   name,
@@ -16,21 +34,25 @@ function TabIcon({
   focused: boolean;
 }) {
   return (
-    <MaterialIcons name={name} size={focused ? 26 : 24} color={color} />
+    <TabIconWrap focused={focused}>
+      <MaterialIcons name={name} size={focused ? 24 : 22} color={color} />
+    </TabIconWrap>
   );
 }
 
 function CartTabIcon({ color, focused }: { color: string; focused: boolean }) {
   const count = useCartStore((s) => s.getItemCount());
   return (
-    <View>
-      <MaterialIcons name="shopping-bag" size={focused ? 26 : 24} color={color} />
-      {count > 0 && (
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{count > 9 ? '9+' : count}</Text>
-        </View>
-      )}
-    </View>
+    <TabIconWrap focused={focused}>
+      <View>
+        <MaterialIcons name="shopping-bag" size={focused ? 24 : 22} color={color} />
+        {count > 0 && (
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{count > 9 ? '9+' : count}</Text>
+          </View>
+        )}
+      </View>
+    </TabIconWrap>
   );
 }
 
@@ -39,28 +61,41 @@ function RewardsTabIcon({ color, focused }: { color: string; focused: boolean })
   const points = profile?.points ?? 0;
 
   return (
-    <View>
-      <MaterialIcons name="card-giftcard" size={focused ? 26 : 24} color={color} />
-      {points > 0 && (
-        <View style={[styles.pointsBadge, focused && styles.pointsBadgeFocused]}>
-          <Text style={styles.pointsBadgeText}>{points >= 1000 ? '1k+' : points}</Text>
-        </View>
-      )}
-    </View>
+    <TabIconWrap focused={focused}>
+      <View>
+        <MaterialIcons name="card-giftcard" size={focused ? 24 : 22} color={color} />
+        {points > 0 && (
+          <View style={[styles.pointsBadge, focused && styles.pointsBadgeFocused]}>
+            <Text style={styles.pointsBadgeText}>{points >= 1000 ? '1k+' : points}</Text>
+          </View>
+        )}
+      </View>
+    </TabIconWrap>
   );
 }
 
+// Suppress unused warning — kept for future use if a rewards tab is added back.
+void RewardsTabIcon;
+
 export default function TabsLayout() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+
+  // Bottom inset already gives us the home-indicator clearance on iPhone X+.
+  // Pair it with a fixed 8px breathing room so labels never crowd the bezel.
+  const bottomPad = Math.max(insets.bottom, Spacing[2]);
+  const tabBarHeight = 60 + bottomPad;
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [styles.tabBar, { height: tabBarHeight, paddingBottom: bottomPad }],
         tabBarActiveTintColor: Colors.primaryBrown,
         tabBarInactiveTintColor: Colors.textMuted,
         tabBarLabelStyle: styles.tabLabel,
+        tabBarItemStyle: styles.tabItem,
+        tabBarLabelPosition: 'below-icon',
       }}
     >
       <Tabs.Screen
@@ -117,15 +152,30 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     borderTopColor: Colors.border,
     borderTopWidth: 1,
-    height: 72,
-    paddingBottom: 12,
-    paddingTop: 8,
+    paddingTop: Spacing[1.5],
     ...Shadows.lg,
+  },
+  tabItem: {
+    paddingTop: Platform.OS === 'ios' ? 2 : 0,
+    gap: 2,
   },
   tabLabel: {
     fontFamily: FontFamily.medium,
     fontSize: FontSize.xs,
     marginTop: 2,
+    // Arabic glyphs sit higher than Latin — extra line height keeps labels off the icon
+    lineHeight: 14,
+    includeFontPadding: false,
+  },
+  iconWrap: {
+    width: ICON_WRAP_W,
+    height: ICON_WRAP_H,
+    borderRadius: ICON_WRAP_H / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconWrapFocused: {
+    backgroundColor: Colors.primaryBrown + '18', // ~9% opacity primary brown pill
   },
   badge: {
     position: 'absolute',
