@@ -4,24 +4,27 @@
     "slug": "sukar-helo",
     "version": "2.3.0",
     "orientation": "portrait",
-    "icon": "./assets/lava-icon.png",
+    "icon": "./assets/sukar-helo.png",
     "userInterfaceStyle": "light",
     "scheme": "sukarhelo",
     "splash": {
-      "image": "./assets/lava-icon.png",
+      "image": "./assets/sukar-helo.png",
       "resizeMode": "contain",
       "backgroundColor": "#FDF8F0"
     },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "org.clientvault.sukarhelo",
-      "buildNumber": "1"
+      "buildNumber": "4",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png",
+        "foregroundImage": "./assets/sukar-helo.png",
+        "backgroundImage": "./assets/sukar-helo.png",
+        "monochromeImage": "./assets/sukar-helo.png",
         "backgroundColor": "#FDF8F0"
       },
       "package": "org.clientvault.sukarhelo"
@@ -33,20 +36,30 @@
     "plugins": [
       [
         "expo-router",
-        { "root": "app" }
+        {
+          "root": "app"
+        }
       ],
       "expo-font",
       [
         "expo-splash-screen",
         {
           "backgroundColor": "#FDF8F0",
-          "image": "./assets/lava-icon.png",
+          "image": "./assets/sukar-helo.png",
           "imageWidth": 200
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "root": "app"
+      },
+      "eas": {
+        "projectId": "70ee0315-4602-4bd6-a1c6-043641104466"
+      }
     }
   }
 }
