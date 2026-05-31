@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, View, StyleSheet, ViewStyle } from 'react-native';
-import { Colors, Radius } from '../../theme';
+import { Colors, Radius, Spacing } from '../../theme';
 
 interface SkeletonProps {
   width?: number | `${number}%`;
@@ -52,7 +52,7 @@ export function ProductCardSkeleton({ width }: { width?: number }) {
 }
 
 export function BannerSkeleton() {
-  return <Skeleton height={160} borderRadius={16} style={{ marginHorizontal: 20 }} />;
+  return <Skeleton height={160} borderRadius={Radius.lg} style={{ marginHorizontal: 20 }} />;
 }
 
 const styles = StyleSheet.create({
@@ -61,13 +61,14 @@ const styles = StyleSheet.create({
   },
   cardSkeleton: {
     backgroundColor: Colors.surface,
-    borderRadius: 14,
+    borderRadius: Radius.lg,
     overflow: 'hidden',
+
   },
   imageSkeleton: {
     width: '100%',
   },
   textSkeletons: {
-    padding: 12,
+    padding: Spacing[3],
   },
 });

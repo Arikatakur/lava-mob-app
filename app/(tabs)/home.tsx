@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   RefreshControl,
+  Image,
+  Platform,
   useWindowDimensions,
 } from 'react-native';
 import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ScreenWrapper } from '../../src/components/layout/ScreenWrapper';
-import { SectionHeader } from '../../src/components/ui/SectionHeader';
 import { ProductCard } from '../../src/components/product/ProductCard';
 import { PromoBanner } from '../../src/components/product/PromoBanner';
 import { ProductCardSkeleton, BannerSkeleton } from '../../src/components/ui/SkeletonLoader';
@@ -26,9 +27,8 @@ import { useAuthStore } from '../../src/store/useAuthStore';
 import { Colors, FontFamily, FontSize, Spacing, Radius, Shadows, Layout } from '../../src/theme';
 import type { Product } from '../../src/types';
 
-const CARD_GAP = Layout.cardGap;            // 12
-const SCREEN_PAD = Layout.screenPaddingHorizontal; // 16
-const CAROUSEL_PEEK = 40;                   // px of third card visible — intentional, not awkward
+const CARD_GAP = Layout.cardGap;
+const SCREEN_PAD = Layout.screenPaddingHorizontal;
 
 function getTierLabel(points: number, t: ReturnType<typeof useTranslation>['t']) {
   if (points >= 1000) return t.rewards.gold;
@@ -58,8 +58,7 @@ function LoyaltyCard({ points, isRTL, t }: {
   return (
     <TouchableOpacity
       style={styles.loyaltyCard}
-      onPress={() => // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      router.push('/rewards' as any)}
+      onPress={() => router.push('/rewards' as any)}
       activeOpacity={0.85}
     >
       <View style={styles.loyaltyBgCircle1} />
@@ -101,6 +100,18 @@ function LoyaltyCard({ points, isRTL, t }: {
   );
 }
 
+function LogoHeader() {
+  return (
+    <View style={styles.logoCircle}>
+      <Image
+        source={require('../../assets/sukar-helo.png')}
+        style={styles.logo}
+        resizeMode="contain"
+      />
+    </View>
+  );
+}
+
 export default function Home() {
   const { t, isRTL } = useTranslation();
   const { localize } = useLocalizedText();
@@ -109,27 +120,38 @@ export default function Home() {
   const { isFavorite, toggle } = useFavoritesStore();
   const { width: screenW } = useWindowDimensions();
   const [refreshing, setRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  // Carousel card width: 2 full cards + small peek of the third — intentional, never squished
-  const carouselCardWidth = Math.floor((screenW - SCREEN_PAD * 2 - CARD_GAP - CAROUSEL_PEEK) / 2);
+  const carouselCardWidth = Math.floor((screenW - SCREEN_PAD * 2 - CARD_GAP) / 2);
 
-  const { banners, loading: bannersLoading } = useBanners();
-  const { categories } = useCategories();
-  const { products: featured, loading: featuredLoading } = useFeaturedProducts();
-  const { products: menuProducts, loading: menuLoading } = useProducts(selectedCategory !== 'all' ? selectedCategory : undefined);
+  const { banners, loading: bannersLoading } = useBanners(refreshKey);
+  const { categories } = useCategories(refreshKey);
+  const { products: featured, loading: featuredLoading } = useFeaturedProducts(refreshKey);
+  const { products: menuProducts, loading: menuLoading } = useProducts(selectedCategory !== 'all' ? selectedCategory : undefined, refreshKey);
 
-  const firstName = profile?.full_name?.split(' ')[0];
-  const greeting = firstName
-    ? `${t.home.greeting} ${firstName}!`
-    : `${t.home.greeting} 🍫`;
+  useEffect(() => {
+    if (!refreshing) return;
+    if (!bannersLoading && !featuredLoading && !menuLoading) {
+      setRefreshing(false);
+    }
+  }, [refreshing, bannersLoading, featuredLoading, menuLoading]);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setRefreshKey((prev) => prev + 1);
+  };
 
   const handleAddToCart = (product: Product) => {
     addItem(product, 1, []);
   };
 
+  const handleCategoryPress = (slug: string) => {
+    setSelectedCategory(slug);
+  };
+
   const allCategories = [
-    { id: 'all', name_en: t.common.all, name_he: t.common.all, name_ar: t.common.all, slug: 'all', sort_order: 0, is_active: true },
+    { id: 'all', name_en: t.common.all, name_he: t.common.all, name_ar: t.common.all, slug: 'all', sort_order: 0, is_active: true, icon_name: 'grid-view' },
     ...categories,
   ];
 
@@ -152,30 +174,39 @@ export default function Home() {
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={() => setRefreshing(false)}
+            onRefresh={handleRefresh}
             tintColor={Colors.primaryBrown}
           />
         }
       >
-        {/* Top Bar */}
-        <View style={[styles.topBar, isRTL && styles.rtl]}>
-          <View style={styles.topBarText}>
-            <Text style={[styles.greeting, isRTL && styles.alignRight]} numberOfLines={1}>
-              {greeting}
-            </Text>
-            <Text style={[styles.subGreeting, isRTL && styles.alignRight]} numberOfLines={1}>
-              {t.home.whatToday}
-            </Text>
-          </View>
+        {/* Header */}
+        <View style={styles.topBar}>
           <TouchableOpacity
-            style={styles.searchBtn}
-            onPress={() => router.push('/(tabs)/menu')}
+            style={styles.notifBtn}
+            onPress={() => router.push('/(tabs)/profile')}
           >
-            <MaterialIcons name="search" size={24} color={Colors.textPrimary} />
+            <MaterialIcons name="notifications-none" size={24} color={Colors.textPrimary} />
           </TouchableOpacity>
+          <View style={styles.headerRight}>
+            <View style={styles.headerText}>
+              <Text style={styles.greeting}>مرحباً</Text>
+              <Text style={styles.subGreeting}>ماذا تشتهين اليوم؟</Text>
+            </View>
+            <LogoHeader />
+          </View>
         </View>
 
-        {/* Loyalty Card — signed-in users only */}
+        {/* Search Bar */}
+        <TouchableOpacity
+          style={styles.searchBar}
+          onPress={() => router.push('/(tabs)/menu?focus=1')}
+          activeOpacity={0.8}
+        >
+          <MaterialIcons name="search" size={20} color={Colors.textMuted} />
+          <Text style={styles.searchPlaceholder}>ابحثي عن حلوى أو مشروب</Text>
+        </TouchableOpacity>
+
+        {/* Loyalty Card */}
         {user && profile && (
           <View style={styles.loyaltySection}>
             <LoyaltyCard points={profile.points ?? 0} isRTL={isRTL} t={t} />
@@ -206,24 +237,11 @@ export default function Home() {
               />
             )}
           />
-        ) : (
-          <View style={styles.heroBanner}>
-            <View style={styles.heroContent}>
-              <Text style={styles.heroTag}>🍫 {t.home.heroDessert ?? t.home.heroCoffee}</Text>
-              <Text style={styles.heroTitle}>{t.home.heroCrafted}</Text>
-              <TouchableOpacity
-                style={styles.heroBtn}
-                onPress={() => router.push('/(tabs)/menu')}
-              >
-                <Text style={styles.heroBtnText}>{t.home.heroOrder}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
+        ) : null}
 
         {/* Categories */}
         <View style={styles.sectionGap}>
-          <SectionHeader title={t.home.categories} isRTL={isRTL} />
+          <Text style={styles.sectionLabel}>الفئات</Text>
           <FlatList
             data={allCategories}
             horizontal
@@ -235,7 +253,8 @@ export default function Home() {
               <CategoryChip
                 label={localize(item, 'name')}
                 isSelected={selectedCategory === item.slug}
-                onPress={() => setSelectedCategory(item.slug)}
+                onPress={() => handleCategoryPress(item.slug)}
+                iconName={item.icon_name}
               />
             )}
           />
@@ -243,12 +262,13 @@ export default function Home() {
 
         {/* Featured */}
         <View style={styles.sectionGap}>
-          <SectionHeader
-            title={t.home.featured}
-            actionLabel={t.common.seeAll}
-            onAction={() => router.push('/(tabs)/menu')}
-            isRTL={isRTL}
-          />
+          <View style={styles.sectionTitleRow}>
+            <MaterialIcons name="auto-awesome" size={22} color={Colors.softGold} />
+            <Text style={styles.sectionTitle}>المميزة</Text>
+            <TouchableOpacity onPress={() => router.push('/(tabs)/menu')}>
+              <Text style={styles.seeAllText}>عرض الكل</Text>
+            </TouchableOpacity>
+          </View>
           {featuredLoading ? (
             <FlatList
               data={[1, 2, 3]}
@@ -272,22 +292,24 @@ export default function Home() {
           )}
         </View>
 
-        {/* Menu by category */}
-        <View style={[styles.sectionGap, styles.bottomPad]}>
-          <SectionHeader
-            title={selectedCategory === 'all' ? t.home.popular : localize(allCategories.find(c => c.slug === selectedCategory) ?? allCategories[0], 'name')}
-            isRTL={isRTL}
-          />
+        {/* Most Ordered */}
+        <View style={styles.mostOrderedWrap}>
+          <View style={styles.sectionTitleRow}>
+            <MaterialIcons name="emoji-events" size={22} color={Colors.softGold} />
+            <Text style={styles.sectionTitle}>الأكثر طلباً</Text>
+            <TouchableOpacity onPress={() => router.push('/(tabs)/menu')}>
+              <Text style={styles.seeAllText}>عرض الكل</Text>
+            </TouchableOpacity>
+          </View>
           {menuLoading ? (
-            <FlatList
-              data={[1, 2, 3]}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(i) => String(i)}
-              contentContainerStyle={styles.productsList}
-              ItemSeparatorComponent={() => <View style={{ width: CARD_GAP }} />}
-              renderItem={() => <ProductCardSkeleton width={carouselCardWidth} />}
-            />
+            <View style={styles.gridSkeleton}>
+              {[1, 2, 3, 4].map((i) => <ProductCardSkeleton key={i} />)}
+            </View>
+          ) : menuProducts.length === 0 ? (
+            <View style={styles.emptyResults}>
+              <Text style={styles.emptyTitle}>{t.search.noResults}</Text>
+              <Text style={styles.emptySubtitle}>{t.search.noResultsSubtitle}</Text>
+            </View>
           ) : (
             <FlatList
               data={menuProducts}
@@ -306,167 +328,264 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.backgroundPrimary,
+  },
+  flatList: {
+    paddingBottom: 200,
+  },
   topBar: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: SCREEN_PAD,
-    paddingTop: Spacing[4],
-    paddingBottom: Spacing[3],
-    gap: Spacing[3],
+    alignItems: 'center',
+    paddingHorizontal: Spacing[5],
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    paddingBottom: Spacing[4],
   },
-  topBarText: { flex: 1 },
-  rtl: { flexDirection: 'row-reverse' },
-  alignRight: { textAlign: 'right' },
   greeting: {
-    fontFamily: FontFamily.bold,
-    fontSize: FontSize['2xl'],
-    color: Colors.textPrimary,
+    fontSize: 26,
+    fontWeight: '700',
+    color: Colors.primaryBrown,
+    fontFamily: FontFamily.semiBold,
+    textAlign: 'right',
   },
   subGreeting: {
+    fontSize: 15,
+    color: Colors.textMuted,
     fontFamily: FontFamily.regular,
-    fontSize: FontSize.base,
-    color: Colors.textSecondary,
     marginTop: 2,
+    textAlign: 'right',
   },
-  searchBtn: {
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing[3],
+  },
+  headerText: {
+    alignItems: 'flex-end',
+  },
+  notifBtn: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.white,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: Colors.border,
+    ...Shadows.sm,
+  },
+  logoCircle: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Shadows.md,
+  },
+  logo: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.white,
+    marginHorizontal: Spacing[5],
+    paddingHorizontal: Spacing[4],
+    height: 52,
+    borderRadius: 26,
+    gap: Spacing[3],
+    ...Shadows.md,
+  },
+  searchPlaceholder: {
+    fontSize: 15,
+    color: Colors.textMuted,
+    fontFamily: FontFamily.regular,
+    flex: 1,
+    textAlign: 'right',
   },
   loyaltySection: {
-    paddingHorizontal: SCREEN_PAD,
-    marginBottom: Spacing[2],
+    paddingHorizontal: Spacing[5],
+    marginTop: Spacing[5],
   },
+  bannersContainer: {
+    paddingHorizontal: Spacing[5],
+    marginTop: Spacing[5],
+    gap: Spacing[4],
+  },
+  sectionGap: {
+    marginTop: Spacing[6],
+  },
+  sectionLabel: {
+    fontSize: 15,
+    color: Colors.textMuted,
+    fontFamily: FontFamily.regular,
+    paddingHorizontal: Spacing[5],
+    marginBottom: Spacing[3],
+    textAlign: 'right',
+  },
+  categoriesList: {
+    paddingHorizontal: Spacing[5],
+    gap: Spacing[4],
+  },
+  sectionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing[2],
+    paddingHorizontal: Spacing[5],
+    marginBottom: Spacing[3],
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.primaryBrown,
+    fontFamily: FontFamily.semiBold,
+    flex: 1,
+    textAlign: 'right',
+  },
+  seeAllText: {
+    fontSize: 13,
+    color: Colors.softGold,
+    fontFamily: FontFamily.regular,
+  },
+  productsList: {
+    paddingHorizontal: Spacing[5],
+    gap: Spacing[4],
+    paddingRight: Spacing[5],
+  },
+  mostOrderedWrap: {
+    marginTop: Spacing[6],
+    marginBottom: Spacing[6],
+  },
+  gridSkeleton: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: Spacing[4],
+    gap: Spacing[4],
+  },
+  emptyResults: {
+    alignItems: 'center',
+    paddingVertical: Spacing[10],
+    paddingHorizontal: Spacing[5],
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+    fontFamily: FontFamily.semiBold,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: Colors.textMuted,
+    fontFamily: FontFamily.regular,
+    marginTop: Spacing[2],
+    textAlign: 'center',
+  },
+  skeletonItem: {
+    backgroundColor: Colors.skeletonBase,
+    borderRadius: Radius['2xl'],
+  },
+
+  // ── Loyalty Card ─────────────────────────────────────
   loyaltyCard: {
-    backgroundColor: Colors.darkEspresso,
-    borderRadius: Radius.xl,
-    padding: Spacing[4],
+    backgroundColor: Colors.primaryBrown,
+    borderRadius: Radius['2xl'],
+    padding: Spacing[5],
+    position: 'relative',
     overflow: 'hidden',
     ...Shadows.md,
   },
   loyaltyBgCircle1: {
     position: 'absolute',
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: Colors.primaryBrown,
-    opacity: 0.2,
-    top: -50,
+    top: -30,
     right: -30,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: 'rgba(255,255,255,0.06)',
   },
   loyaltyBgCircle2: {
     position: 'absolute',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: Colors.accentCaramel,
-    opacity: 0.1,
-    bottom: -20,
-    left: 40,
+    bottom: -40,
+    left: -20,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(255,255,255,0.04)',
   },
   loyaltyContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  loyaltyLeft: { flex: 1, gap: 2 },
+  rtl: { flexDirection: 'row-reverse' },
+  alignRight: { textAlign: 'right' },
+  loyaltyLeft: {
+    gap: Spacing[1],
+  },
   loyaltyTierBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    alignSelf: 'flex-start',
     paddingHorizontal: Spacing[2],
     paddingVertical: 2,
     borderRadius: Radius.full,
-    marginBottom: Spacing[1],
+    alignSelf: 'flex-start',
   },
-  loyaltyTierText: { fontFamily: FontFamily.semiBold, fontSize: 10, letterSpacing: 0.5 },
+  loyaltyTierText: {
+    fontFamily: FontFamily.semiBold,
+    fontSize: FontSize.xs,
+    textTransform: 'uppercase',
+  },
   loyaltyPoints: {
     fontFamily: FontFamily.bold,
-    fontSize: 30,
+    fontSize: FontSize['5xl'],
     color: Colors.white,
-    lineHeight: 34,
+    marginTop: Spacing[1],
   },
   loyaltyPointsLabel: {
     fontFamily: FontFamily.regular,
-    fontSize: FontSize.xs,
-    color: Colors.warmBeige,
-    marginBottom: Spacing[2],
+    fontSize: FontSize.sm,
+    color: 'rgba(255,255,255,0.7)',
   },
-  loyaltyProgressWrap: { gap: 3 },
+  loyaltyProgressWrap: {
+    marginTop: Spacing[2],
+    gap: Spacing[1],
+  },
   loyaltyProgressBar: {
     height: 4,
-    backgroundColor: Colors.primaryBrown,
+    backgroundColor: 'rgba(255,255,255,0.2)',
     borderRadius: 2,
-    overflow: 'hidden',
-    width: 130,
+    width: 160,
   },
-  loyaltyProgressFill: { height: '100%', borderRadius: 2 },
-  loyaltyProgressLabel: { fontFamily: FontFamily.regular, fontSize: 10, color: Colors.warmBeige },
-  loyaltyRight: { alignItems: 'center', gap: Spacing[2] },
+  loyaltyProgressFill: {
+    height: '100%',
+    borderRadius: 2,
+  },
+  loyaltyProgressLabel: {
+    fontFamily: FontFamily.regular,
+    fontSize: FontSize.xs,
+    color: 'rgba(255,255,255,0.6)',
+  },
+  loyaltyRight: {
+    alignItems: 'center',
+    gap: Spacing[1],
+  },
   loyaltyQrIcon: {
-    width: 58,
-    height: 58,
+    width: 56,
+    height: 56,
     borderRadius: Radius.lg,
-    backgroundColor: Colors.primaryBrown,
+    backgroundColor: 'rgba(255,255,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   loyaltyScanHint: {
-    fontFamily: FontFamily.medium,
+    fontFamily: FontFamily.regular,
     fontSize: 10,
     color: Colors.warmBeige,
     textAlign: 'center',
     maxWidth: 60,
   },
-  bannersContainer: {
-    paddingHorizontal: SCREEN_PAD,
-    paddingBottom: Spacing[4],
-  },
-  heroBanner: {
-    marginHorizontal: SCREEN_PAD,
-    height: 180,
-    borderRadius: Radius.xl,
-    backgroundColor: Colors.darkEspresso,
-    overflow: 'hidden',
-    marginBottom: Spacing[4],
-    justifyContent: 'flex-end',
-  },
-  heroContent: { padding: Spacing[5] },
-  heroTag: {
-    fontFamily: FontFamily.medium,
-    fontSize: FontSize.xs,
-    color: Colors.accentCaramel,
-    letterSpacing: 1,
-    marginBottom: Spacing[2],
-  },
-  heroTitle: {
-    fontFamily: FontFamily.bold,
-    fontSize: FontSize['3xl'],
-    color: Colors.white,
-    lineHeight: 36,
-    marginBottom: Spacing[4],
-  },
-  heroBtn: {
-    alignSelf: 'flex-start',
-    backgroundColor: Colors.accentCaramel,
-    paddingHorizontal: Spacing[5],
-    paddingVertical: Spacing[2],
-    borderRadius: Radius.full,
-  },
-  heroBtnText: {
-    fontFamily: FontFamily.semiBold,
-    fontSize: FontSize.sm,
-    color: Colors.white,
-  },
-  sectionGap: { marginTop: Spacing[6] },
-  categoriesList: { paddingHorizontal: SCREEN_PAD },
-  productsList: { paddingHorizontal: SCREEN_PAD },
-  bottomPad: { marginBottom: Spacing[8] },
 });

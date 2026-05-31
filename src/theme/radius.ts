@@ -4,12 +4,13 @@
  */
 
 export const Radius = {
-  xs: 2,
+  xs: 4,
   sm: 8,
   md: 12,
-  lg: 14,
+  lg: 16,
   xl: 20,
-  '2xl': 22,
+  '2xl': 24,
+  '3xl': 32,
   full: 100,
 } as const;
 

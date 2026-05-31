@@ -46,6 +46,7 @@ export interface Product {
   is_available: boolean;
   is_new: boolean;
   calories?: number;
+  rating?: number;
   prep_time_min?: number;
   sort_order: number;
   tags?: string[];

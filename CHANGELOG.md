@@ -6,7 +6,7 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 
 ---
 
-## v2.3.0 - 2026-05-25
+## v0.7.0 - 2026-05-25
 
 ### Added — Menu data
 - Arabic localization columns (`name_ar`, `description_ar`, `title_ar`, `subtitle_ar`, etc.) on `products`, `categories`, `product_options`, `product_images`, `banners`, `order_items`, and `rewards`.
@@ -48,7 +48,101 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 
 ---
 
-## v2.2.0 - 2026-05-12
+## v0.6.0 - 2026-05-31
+
+### Added
+- **Premium dessert-shop redesign** — soft cream background (#F8F4EE), chocolate brown (#8B5A3C), soft gold accents (#D8B26E)
+- **Arabic typography system** — Cairo SemiBold (headings), IBM Plex Sans Regular (body), Tajawal Medium (labels)
+- **Floating bottom tab bar** — absolute positioned, white background, radius 32px, active tab filled brown circle, shadow
+- **ScreenWrapper bottom padding** — 100px iOS / 90px Android for floating tab bar clearance
+- **ProductCard StarRow** — dynamic full/half/empty stars with gold color
+- **ProductCard image 70% ratio** — image occupies 70% of card height for premium look
+- **Glassmorphism favorite button** — translucent white background with border, positioned top-right
+- **Floating add-to-cart button** — circular brown button with shadow overlay
+- **Search with 300ms debounce and queryRef race-condition guard** — categories always visible during search
+- **Promotional banners** — chocolate brown banners with emoji, title, subtitle, CTA button on home and menu screens
+- **Loyalty card** — tier-based (Bronze/Silver/Gold) with progress bar, QR code, decorative background circles
+
+### Changed
+- **Home screen** — logo circle header, hardcoded Arabic greeting, 52px pill search bar, "الفئات" section, featured/most ordered carousels with 16px card gap
+- **Menu screen** — clean header, pill search bar, categories always visible, promo banner, 2-column grid with equal card widths
+- **ProductCard** — redesigned with centered name, StarRow rating, price, floating add button, glass heart, "New" badge, soft shadow
+- **CategoryChip** — smaller pills (40px height), 16px icons, selected filled chocolate, unselected white with border, equal spacing
+- **Layout spacing** — horizontal padding 20px (Spacing[5]), section gap 24px (Spacing[6]), card gap 16px (Spacing[4])
+- **Shadow system** — soft shadows with chocolate-tinted color, `Shadows.float` for floating elements
+
+### Fixed
+- **ProductCard merge conflicts** — removed duplicate `imageContainer` key, restored missing `favoriteGlow` style
+- **Missing `alignRight` style** — added to home.tsx loyalty card styles
+- **Unused variables** — removed `greetingName`, `currentCategory`, `firstName`, `greeting` from home.tsx
+- **Theme imports** — replaced all `Colors.chocolate` → `Colors.primaryBrown`, `Typography.*` → `FontFamily.*`, `Colors.screenBg` → `Colors.backgroundPrimary`
+
+## v0.5.2 - 2026-05-31
+
+### Added
+- **Premium dessert-shop redesign** — soft cream background (#F8F4EE), chocolate brown (#8B5A3C), soft gold accents (#D8B26E)
+- **Arabic typography system** — Cairo SemiBold (headings), IBM Plex Sans Regular (body), Tajawal Medium (labels)
+- **Floating bottom tab bar** — absolute positioned, white background, radius 32px, active tab filled brown circle, shadow
+- **ScreenWrapper bottom padding** — 100px iOS / 90px Android for floating tab bar clearance
+- **ProductCard StarRow** — dynamic full/half/empty stars with gold color
+- **ProductCard image 70% ratio** — image occupies 70% of card height for premium look
+- **Glassmorphism favorite button** — translucent white background with border, positioned top-right
+- **Floating add-to-cart button** — circular brown button with shadow overlay
+- **Search with 300ms debounce and queryRef race-condition guard** — categories always visible during search
+- **Promotional banners** — chocolate brown banners with emoji, title, subtitle, CTA button on home and menu screens
+- **Loyalty card** — tier-based (Bronze/Silver/Gold) with progress bar, QR code, decorative background circles
+
+### Changed
+- **Home screen** — logo circle header, hardcoded Arabic greeting, 52px pill search bar, "الفئات" section, featured/most ordered carousels with 16px card gap
+- **Menu screen** — clean header, pill search bar, categories always visible, promo banner, 2-column grid with equal card widths
+- **ProductCard** — redesigned with centered name, StarRow rating, price, floating add button, glass heart, "New" badge, soft shadow
+- **CategoryChip** — smaller pills (40px height), 16px icons, selected filled chocolate, unselected white with border, equal spacing
+- **Layout spacing** — horizontal padding 20px (Spacing[5]), section gap 24px (Spacing[6]), card gap 16px (Spacing[4])
+- **Shadow system** — soft shadows with chocolate-tinted color, `Shadows.float` for floating elements
+- **Home header** — replaced profile avatar with sukar-helo.png logo in a circular container, hardcoded Arabic greeting
+- **Promotional banner** — added chocolate-themed promo banners between categories and featured/menu sections on both home and menu screens
+- **Menu search bar** — redesigned with white pill shape, shadow, and updated typography
+
+### Fixed
+- **ProductCard merge conflicts** — removed duplicate `imageContainer` key, restored missing `favoriteGlow` style
+- **Missing `alignRight` style** — added to home.tsx loyalty card styles
+- **Unused variables** — removed `greetingName`, `currentCategory`, `firstName`, `greeting` from home.tsx
+- **Theme imports** — replaced all `Colors.chocolate` → `Colors.primaryBrown`, `Typography.*` → `FontFamily.*`, `Colors.screenBg` → `Colors.backgroundPrimary`
+- **Color references** — replaced `Colors.chocolate` → `Colors.primaryBrown`, `Typography.arabic*` → `FontFamily.*`, `Colors.screenBg` → `Colors.backgroundPrimary`
+- **Missing imports** — added `Platform` and `Shadows` imports to home and menu screens
+- **Logo image** — `require('../../assets/logo.png')` → `require('../../assets/sukar-helo.png')`
+
+## v0.5.1 - 2026-05-31
+
+### Changed
+- **Home screen refresh** — pull-to-refresh now reloads banners, featured products, categories, and menu items.
+- **Home search input** — added inline search field to filter category products without leaving the home screen.
+- **Category browsing** — category chips now switch products locally instead of navigating immediately to the menu screen.
+- **No-results state** — added friendly empty state when filtered category products do not match the search.
+
+## v0.5.0 - 2026-05-31
+
+### Fixed
+- **CategoryChip** resizing when selected — both states now use the same `fontFamily` so text width stays consistent.
+- **Menu grid layout** — removed hardcoded widths, added proper `paddingHorizontal` and `gap` so product cards fill the screen evenly and don't change size when switching categories.
+- **Categories FlatList overlap** — added `flexGrow: 0` to prevent it from stretching and covering header content.
+- **Single product in row stretching** — replaced `flex: 1` with calculated fixed width per card using `useWindowDimensions`, so a lone product stays at half-width instead of filling the whole row.
+- **ProductCard** — added optional `style` prop so cards in the menu grid can use dynamic widths while home page horizontal lists keep the default 160px.
+- **Search debounce & race condition** — added 300ms debounce and `queryRef` to prevent stale results from overwriting newer searches; immediate skeleton feedback on keystroke.
+- **Search auto-focus** — pressing the search icon on the home page now auto-focuses the search bar on the menu page.
+- **Search icon tappable** — wrapped search icon in `TouchableOpacity` so users can tap it to focus the input.
+- **Categories always visible** — removed `{!isSearching &&}` that hid categories during search; tapping a category now clears search text.
+- **Remove home page search bar** — removed the inline `Input` search field from the home page; only the search icon button (navigates to menu) remains.
+- **Design polish** — restored missing menu header title; fixed RTL text alignment in `SectionHeader`; replaced hardcoded `borderRadius`/`shadow`/`letterSpacing` in `SkeletonLoader`, `QuantityStepper`, and `Badge` with theme tokens.
+- **✨ Premium UI Redesign** — complete visual overhaul:
+  - **Colors**: soft cream `#F8F4EE` background, chocolate brown `#8B5A3C` primary, soft gold `#D8B26E` accents
+  - **Typography**: Cairo SemiBold, IBM Plex Sans Arabic, Tajawal Medium
+  - **ProductCard**: larger image, centered name, rating stars, prep time, glassmorphism heart, floating plus button with shadow
+  - **Home Screen**: profile avatar, Arabic greeting, pill-style search bar, category pills with icons, section icons, most ordered section
+  - **Tab Bar**: floating bottom bar with rounded corners, active tab filled brown circle
+  - **Shadows**: softer, more premium `Shadows.float` token
+
+## v0.4.3 - 2026-05-12
 
 ### Changed
 - **Post-login navigation** — after OTP verification (both new and returning users), app navigates to `/order-mode` instead of `/(tabs)/home`.
@@ -63,13 +157,20 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 
 ---
 
-## v2.1.1 - 2026-05-12
+## v0.4.2 - 2026-05-12
 
 ### Changed
 - **Order mode screen** — polished to App Store-level premium UX:
   - Tighter vertical rhythm; CTA button sits close to selection cards, no dead space.
   - Three ambient glow circles (caramel top-right, mocha bottom-left, soft center) add depth without flat areas.
   - Cards are taller (`paddingVertical` +4px), rest with softer shadow, lift with elevated shadow when selected.
+  
+---
+
+## v0.4.1 - 2026-05-31
+
+### Fixed
+- `ProductCard` fixed to use a consistent height so menu grid doesn't resize when switching categories.
   - Selected state uses warm gold (`accentCaramel`) border + subtle gold inner glow overlay + dark espresso icon badge shadow.
   - Spring-pulse scale animation fires on card selection (1.0 → 1.03 → 1.0).
   - Press feedback tightened (scale 0.965, no bounce).
@@ -78,7 +179,7 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 
 ---
 
-## v2.1.0 - 2026-05-12
+## v0.3.0 - 2026-05-12
 
 ### Added
 - **Arabic language support** — full `src/locales/ar.ts` with complete translations across all screens.
@@ -100,7 +201,7 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 
 ---
 
-## v2.0.0 - 2026-05-12
+## v0.2.0 - 2026-05-12
 
 ### Changed
 - **Complete rebrand** from "Lava Cafe" to "Sukar Helo" across the entire application.
@@ -138,7 +239,7 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 
 ---
 
-## v1.0.0 - 2025-01-01
+## v0.1.0 - 2025-01-01
 
 ### Added
 - Initial release of Lava Cafe mobile application.

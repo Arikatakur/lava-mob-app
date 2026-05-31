@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
-import { Colors, FontFamily, FontSize, Radius, Spacing } from '../../theme';
+import { Colors, FontFamily, FontSize, LetterSpacing, Radius, Spacing } from '../../theme';
 
 type BadgeVariant = 'new' | 'bestseller' | 'hot' | 'sale' | 'gold';
 
@@ -36,6 +36,6 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: FontFamily.semiBold,
     fontSize: FontSize.xs,
-    letterSpacing: 0.3,
+    letterSpacing: LetterSpacing.wide,
   },
 });

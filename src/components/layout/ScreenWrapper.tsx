@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle, StatusBar } from 'react-native';
+import { View, StyleSheet, ViewStyle, StatusBar, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors } from '../../theme';
+import { Colors, Spacing } from '../../theme';
 
 interface ScreenWrapperProps {
   children: React.ReactNode;
@@ -34,5 +34,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    paddingBottom: Platform.OS === 'ios' ? 100 : 90,
   },
 });

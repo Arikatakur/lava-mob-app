@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ScreenWrapper } from '../../src/components/layout/ScreenWrapper';
 import { ProductCard } from '../../src/components/product/ProductCard';
@@ -21,11 +21,11 @@ import { useCategories, useProducts } from '../../src/hooks/useProducts';
 import { productsService } from '../../src/services/products.service';
 import { useCartStore } from '../../src/store/useCartStore';
 import { useFavoritesStore } from '../../src/store/useFavoritesStore';
-import { Colors, FontFamily, FontSize, Radius, Spacing, Layout } from '../../src/theme';
+import { Colors, FontFamily, FontSize, Radius, Spacing, Shadows, Layout } from '../../src/theme';
 import type { Product } from '../../src/types';
 
-const SCREEN_PAD = Layout.screenPaddingHorizontal; // 16
-const CARD_GAP = Layout.cardGap;                   // 12
+const SCREEN_PAD = Layout.screenPaddingHorizontal;
+const CARD_GAP = Layout.cardGap;
 
 export default function Menu() {
   const { t, isRTL } = useTranslation();
@@ -34,15 +34,17 @@ export default function Menu() {
   const { isFavorite, toggle } = useFavoritesStore();
   const { width: screenW } = useWindowDimensions();
 
+  const { category, focus } = useLocalSearchParams<{ category?: string; focus?: string }>();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState(category ?? 'all');
   const [searchResults, setSearchResults] = useState<Product[] | null>(null);
   const [searching, setSearching] = useState(false);
+  const searchRef = useRef<TextInput>(null);
+  const queryRef = useRef('');
 
   const { categories } = useCategories();
   const { products, loading } = useProducts(selectedCategory !== 'all' ? selectedCategory : undefined);
 
-  // Compute equal-width grid cells: 2 columns, 16px outer + 12px center gap
   const gridCardWidth = Math.floor((screenW - SCREEN_PAD * 2 - CARD_GAP) / 2);
 
   const allCategories = [
@@ -50,22 +52,49 @@ export default function Menu() {
     ...categories,
   ];
 
-  const handleSearch = async (query: string) => {
+  const handleSearch = (query: string) => {
     setSearchQuery(query);
-    if (!query.trim()) {
+  };
+
+  useEffect(() => {
+    if (category) setSelectedCategory(category);
+  }, [category]);
+
+  useEffect(() => {
+    if (focus === '1' && searchRef.current) {
+      searchRef.current.focus();
+    }
+  }, [focus]);
+
+  useEffect(() => {
+    queryRef.current = searchQuery;
+    setSearching(true);
+
+    if (!searchQuery.trim()) {
       setSearchResults(null);
+      setSearching(false);
       return;
     }
-    setSearching(true);
-    try {
-      const results = await productsService.searchProducts(query.trim());
-      setSearchResults(results);
-    } catch {
-      setSearchResults([]);
-    } finally {
-      setSearching(false);
-    }
-  };
+
+    const timer = setTimeout(async () => {
+      try {
+        const results = await productsService.searchProducts(searchQuery.trim());
+        if (queryRef.current === searchQuery) {
+          setSearchResults(results);
+        }
+      } catch {
+        if (queryRef.current === searchQuery) {
+          setSearchResults([]);
+        }
+      } finally {
+        if (queryRef.current === searchQuery) {
+          setSearching(false);
+        }
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const displayedProducts = searchResults ?? products;
   const isSearching = searchQuery.length > 0;
@@ -73,52 +102,70 @@ export default function Menu() {
   return (
     <ScreenWrapper>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={[styles.title, isRTL && styles.alignRight]}>
-          {isSearching ? t.search.title : t.menu.title}
-        </Text>
+      <View style={styles.topBar}>
+        <View style={styles.headerRight}>
+          <Text style={styles.title}>
+            {isSearching ? t.search.title : t.menu.title}
+          </Text>
+        </View>
       </View>
 
       {/* Search Bar */}
       <View style={[styles.searchBar, isRTL && styles.rtl]}>
-        <MaterialIcons name="search" size={20} color={Colors.textSecondary} />
+        <TouchableOpacity onPress={() => searchRef.current?.focus()}>
+          <MaterialIcons name="search" size={20} color={Colors.textMuted} />
+        </TouchableOpacity>
         <TextInput
-          style={[styles.searchInput, isRTL && styles.alignRight]}
+          ref={searchRef}
+          style={[styles.searchInput, isRTL && styles.rtlInput]}
           placeholder={t.home.searchPlaceholder}
           placeholderTextColor={Colors.textMuted}
           value={searchQuery}
           onChangeText={handleSearch}
           textAlign={isRTL ? 'right' : 'left'}
+          autoFocus={focus === '1'}
         />
         {searchQuery ? (
           <TouchableOpacity onPress={() => handleSearch('')}>
-            <MaterialIcons name="close" size={20} color={Colors.textSecondary} />
+            <MaterialIcons name="close" size={20} color={Colors.textMuted} />
           </TouchableOpacity>
         ) : null}
       </View>
 
-      {/* Categories (hidden during search) */}
-      {!isSearching && (
-        <FlatList
-          data={allCategories}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(c) => c.id}
-          contentContainerStyle={styles.categoriesList}
-          style={styles.categoriesRow}
-          ItemSeparatorComponent={() => <View style={{ width: Spacing[2] }} />}
-          renderItem={({ item }) => (
-            <CategoryChip
-              label={localize(item, 'name')}
-              isSelected={selectedCategory === item.slug}
-              onPress={() => setSelectedCategory(item.slug)}
-            />
-          )}
-        />
-      )}
+      {/* Categories */}
+      <Text style={styles.sectionLabel}>الفئات</Text>
+      <FlatList
+        data={allCategories}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(c) => c.id}
+        contentContainerStyle={styles.categoriesList}
+        style={styles.categoriesRow}
+        ItemSeparatorComponent={() => <View style={{ width: Spacing[2] }} />}
+        renderItem={({ item }) => (
+          <CategoryChip
+            label={localize(item, 'name')}
+            isSelected={selectedCategory === item.slug}
+            onPress={() => {
+              setSelectedCategory(item.slug);
+              if (searchQuery) handleSearch('');
+            }}
+          />
+        )}
+      />
 
       {/* Products Grid */}
-      {loading || searching ? (
+      <View style={styles.productsContainer}>
+      {searching ? (
+        <FlatList
+          data={[1, 2, 3, 4, 5, 6]}
+          numColumns={2}
+          keyExtractor={(i) => String(i)}
+          contentContainerStyle={styles.grid}
+          columnWrapperStyle={styles.row}
+          renderItem={() => <ProductCardSkeleton />}
+        />
+      ) : loading && !isSearching ? (
         <FlatList
           data={[1, 2, 3, 4, 5, 6]}
           numColumns={2}
@@ -154,54 +201,75 @@ export default function Menu() {
           )}
         />
       )}
+      </View>
     </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    paddingHorizontal: SCREEN_PAD,
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: Spacing[5],
     paddingTop: Spacing[4],
     paddingBottom: Spacing[3],
+  },
+  headerRight: {
+    flex: 1,
   },
   title: {
     fontFamily: FontFamily.bold,
     fontSize: FontSize['3xl'],
-    color: Colors.textPrimary,
+    color: Colors.primaryBrown,
+    textAlign: 'right',
   },
-  alignRight: { textAlign: 'right' },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surface,
-    borderRadius: Radius.md,
-    marginHorizontal: SCREEN_PAD,
+    backgroundColor: Colors.white,
+    marginHorizontal: Spacing[5],
     paddingHorizontal: Spacing[4],
-    paddingVertical: Spacing[2.5],
-    borderWidth: 1,
-    borderColor: Colors.border,
-    gap: Spacing[2],
-    marginBottom: Spacing[4],
+    height: 52,
+    borderRadius: 26,
+    gap: Spacing[3],
+    marginBottom: Spacing[5],
+    ...Shadows.md,
   },
   rtl: { flexDirection: 'row-reverse' },
   searchInput: {
     flex: 1,
     fontFamily: FontFamily.regular,
-    fontSize: FontSize.base,
+    fontSize: FontSize.md,
     color: Colors.textPrimary,
   },
+  rtlInput: { textAlign: 'right' },
+  sectionLabel: {
+    fontSize: 15,
+    color: Colors.textMuted,
+    fontFamily: FontFamily.regular,
+    paddingHorizontal: Spacing[5],
+    marginBottom: Spacing[3],
+    textAlign: 'right',
+  },
   categoriesRow: {
-    marginBottom: Spacing[4],
+    flexGrow: 0,
+    marginBottom: Spacing[2],
   },
   categoriesList: {
-    paddingHorizontal: SCREEN_PAD,
+    paddingHorizontal: Spacing[5],
+    gap: Spacing[4],
+    paddingRight: Spacing[5],
   },
   grid: {
-    paddingHorizontal: SCREEN_PAD,
-    paddingBottom: Spacing[10],
-    gap: CARD_GAP,
+    paddingHorizontal: Spacing[5],
+    paddingBottom: Spacing[24],
+    gap: Spacing[3],
   },
   row: {
-    gap: CARD_GAP,
+    justifyContent: 'space-between',
+  },
+  productsContainer: {
+    flex: 1,
   },
 });
