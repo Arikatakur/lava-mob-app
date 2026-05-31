@@ -48,19 +48,71 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 
 ---
 
-## v2.2.3 - 2026-05-31
+## v2.3.0 - 2026-05-31
+
+### Added
+- **Premium dessert-shop redesign** — soft cream background (#F8F4EE), chocolate brown (#8B5A3C), soft gold accents (#D8B26E)
+- **Arabic typography system** — Cairo SemiBold (headings), IBM Plex Sans Regular (body), Tajawal Medium (labels)
+- **Floating bottom tab bar** — absolute positioned, white background, radius 32px, active tab filled brown circle, shadow
+- **ScreenWrapper bottom padding** — 100px iOS / 90px Android for floating tab bar clearance
+- **ProductCard StarRow** — dynamic full/half/empty stars with gold color
+- **ProductCard image 70% ratio** — image occupies 70% of card height for premium look
+- **Glassmorphism favorite button** — translucent white background with border, positioned top-right
+- **Floating add-to-cart button** — circular brown button with shadow overlay
+- **Search with 300ms debounce and queryRef race-condition guard** — categories always visible during search
+- **Promotional banners** — chocolate brown banners with emoji, title, subtitle, CTA button on home and menu screens
+- **Loyalty card** — tier-based (Bronze/Silver/Gold) with progress bar, QR code, decorative background circles
 
 ### Changed
-- **Full luxury redesign** — home and menu screens updated with premium dessert-shop aesthetic (chocolate/gold/cream palette)
+- **Home screen** — logo circle header, hardcoded Arabic greeting, 52px pill search bar, "الفئات" section, featured/most ordered carousels with 16px card gap
+- **Menu screen** — clean header, pill search bar, categories always visible, promo banner, 2-column grid with equal card widths
+- **ProductCard** — redesigned with centered name, StarRow rating, price, floating add button, glass heart, "New" badge, soft shadow
+- **CategoryChip** — smaller pills (40px height), 16px icons, selected filled chocolate, unselected white with border, equal spacing
+- **Layout spacing** — horizontal padding 20px (Spacing[5]), section gap 24px (Spacing[6]), card gap 16px (Spacing[4])
+- **Shadow system** — soft shadows with chocolate-tinted color, `Shadows.float` for floating elements
+
+### Fixed
+- **ProductCard merge conflicts** — removed duplicate `imageContainer` key, restored missing `favoriteGlow` style
+- **Missing `alignRight` style** — added to home.tsx loyalty card styles
+- **Unused variables** — removed `greetingName`, `currentCategory`, `firstName`, `greeting` from home.tsx
+- **Theme imports** — replaced all `Colors.chocolate` → `Colors.primaryBrown`, `Typography.*` → `FontFamily.*`, `Colors.screenBg` → `Colors.backgroundPrimary`
+
+## v2.3.0 - 2026-05-31
+
+### Added
+- **Premium dessert-shop redesign** — soft cream background (#F8F4EE), chocolate brown (#8B5A3C), soft gold accents (#D8B26E)
+- **Arabic typography system** — Cairo SemiBold (headings), IBM Plex Sans Regular (body), Tajawal Medium (labels)
+- **Floating bottom tab bar** — absolute positioned, white background, radius 32px, active tab filled brown circle, shadow
+- **ScreenWrapper bottom padding** — 100px iOS / 90px Android for floating tab bar clearance
+- **ProductCard StarRow** — dynamic full/half/empty stars with gold color
+- **ProductCard image 70% ratio** — image occupies 70% of card height for premium look
+- **Glassmorphism favorite button** — translucent white background with border, positioned top-right
+- **Floating add-to-cart button** — circular brown button with shadow overlay
+- **Search with 300ms debounce and queryRef race-condition guard** — categories always visible during search
+- **Promotional banners** — chocolate brown banners with emoji, title, subtitle, CTA button on home and menu screens
+- **Loyalty card** — tier-based (Bronze/Silver/Gold) with progress bar, QR code, decorative background circles
+
+### Changed
+- **Home screen** — logo circle header, hardcoded Arabic greeting, 52px pill search bar, "الفئات" section, featured/most ordered carousels with 16px card gap
+- **Menu screen** — clean header, pill search bar, categories always visible, promo banner, 2-column grid with equal card widths
+- **ProductCard** — redesigned with centered name, StarRow rating, price, floating add button, glass heart, "New" badge, soft shadow
+- **CategoryChip** — smaller pills (40px height), 16px icons, selected filled chocolate, unselected white with border, equal spacing
+- **Layout spacing** — horizontal padding 20px (Spacing[5]), section gap 24px (Spacing[6]), card gap 16px (Spacing[4])
+- **Shadow system** — soft shadows with chocolate-tinted color, `Shadows.float` for floating elements
 - **Home header** — replaced profile avatar with sukar-helo.png logo in a circular container, hardcoded Arabic greeting
 - **Promotional banner** — added chocolate-themed promo banners between categories and featured/menu sections on both home and menu screens
 - **Menu search bar** — redesigned with white pill shape, shadow, and updated typography
-- **Section headers** — replaced `SectionHeader` component with plain text "الفئات" label and larger chocolate-colored section titles with gold icons
 
 ### Fixed
+- **ProductCard merge conflicts** — removed duplicate `imageContainer` key, restored missing `favoriteGlow` style
+- **Missing `alignRight` style** — added to home.tsx loyalty card styles
+- **Unused variables** — removed `greetingName`, `currentCategory`, `firstName`, `greeting` from home.tsx
+- **Theme imports** — replaced all `Colors.chocolate` → `Colors.primaryBrown`, `Typography.*` → `FontFamily.*`, `Colors.screenBg` → `Colors.backgroundPrimary`
 - **Color references** — replaced `Colors.chocolate` → `Colors.primaryBrown`, `Typography.arabic*` → `FontFamily.*`, `Colors.screenBg` → `Colors.backgroundPrimary`
 - **Missing imports** — added `Platform` and `Shadows` imports to home and menu screens
 - **Logo image** — `require('../../assets/logo.png')` → `require('../../assets/sukar-helo.png')`
+
+## v2.2.3 - 2026-05-31
 
 ## v2.2.2 - 2026-05-31
 

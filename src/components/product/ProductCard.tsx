@@ -21,8 +21,6 @@ interface ProductCardProps {
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
   style?: ViewStyle;
-  /** Explicit pixel width — used by horizontal carousels.
-   *  Omit to fill the parent (used by the menu grid). */
   width?: number;
 }
 
@@ -41,13 +39,7 @@ function StarRow({ rating }: { rating?: number }) {
   return <View style={{ flexDirection: 'row', gap: 1 }}>{stars}</View>;
 }
 
-// Square images keep card heights identical regardless of source ratio.
-// We size the image area with explicit pixel width AND height — `aspectRatio: 1`
-// and `width/height: '100%'` both fail in production: RN Web's Image (background-image
-// wrapper) doesn't track an aspect-ratio'd parent height, and iOS native Image
-// with percentage dimensions occasionally renders blank when the parent's pixel
-// width is computed from `width: '100%'` of a flex child.
-const DEFAULT_IMAGE_SIZE = 160;
+const CARD_IMAGE_RATIO = 0.7;
 
 export function ProductCard({
   product,
@@ -60,32 +52,30 @@ export function ProductCard({
   width,
 }: ProductCardProps) {
   const { isRTL } = useTranslation();
-  const imageSize = width && width > 0 ? width : DEFAULT_IMAGE_SIZE;
+  const cardWidth = width ?? 165;
+  const imageHeight = cardWidth * CARD_IMAGE_RATIO;
 
   return (
     <TouchableOpacity
-      style={[styles.card, width !== undefined ? { width } : styles.cardFlex, style]}
+      style={[styles.card, width !== undefined ? { width: cardWidth } : styles.cardFlex, style]}
       onPress={onPress}
-      activeOpacity={0.9}
+      activeOpacity={0.95}
     >
-      <View style={[styles.imageContainer, { width: imageSize, height: imageSize }]}>
+      <View style={[styles.imageContainer, { height: imageHeight }]}>
         {product.image_url ? (
           <Image
             source={{ uri: product.image_url }}
-            style={{ width: imageSize, height: imageSize }}
+            style={styles.image}
             resizeMode="cover"
           />
         ) : (
-          <View style={[styles.imagePlaceholder, { width: imageSize, height: imageSize }]}>
-            <MaterialIcons name="local-cafe" size={40} color={Colors.softMocha} />
+          <View style={styles.imagePlaceholder}>
+            <MaterialIcons name="local-cafe" size={36} color={Colors.softMocha} />
           </View>
         )}
 
         <View style={[styles.badgeRow, isRTL ? styles.badgeRowRTL : styles.badgeRowLTR]}>
           {product.is_new && <Badge label="New" variant="new" />}
-          {product.tags?.includes('bestseller') && (
-            <Badge label="⭐" variant="bestseller" style={{ marginLeft: 4 }} />
-          )}
         </View>
 
         {onToggleFavorite && (
@@ -96,7 +86,7 @@ export function ProductCard({
             <View style={styles.favoriteGlow}>
               <MaterialIcons
                 name={isFavorite ? 'favorite' : 'favorite-border'}
-                size={18}
+                size={16}
                 color={isFavorite ? Colors.error : Colors.white}
               />
             </View>
@@ -111,18 +101,14 @@ export function ProductCard({
 
         <View style={styles.ratingRow}>
           <StarRow rating={product.rating} />
-          <Text style={styles.ratingText}>{product.rating?.toFixed(1) ?? ''}</Text>
-          {product.prep_time_min ? (
-            <View style={styles.prepBadge}>
-              <MaterialIcons name="access-time" size={10} color={Colors.textMuted} />
-              <Text style={styles.prepText}>{product.prep_time_min} د</Text>
-            </View>
+          {product.rating ? (
+            <Text style={styles.ratingText}>{product.rating.toFixed(1)}</Text>
           ) : null}
         </View>
 
         <View style={[styles.footer, isRTL && styles.footerRTL]}>
           <Text style={styles.price}>₪{product.price.toFixed(0)}</Text>
-          <TouchableOpacity style={styles.addButton} onPress={onAddToCart} activeOpacity={0.8}>
+          <TouchableOpacity style={styles.addButton} onPress={onAddToCart} activeOpacity={0.85}>
             <MaterialIcons name="add" size={20} color={Colors.white} />
           </TouchableOpacity>
         </View>
@@ -136,20 +122,26 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     borderRadius: Radius.xl,
     overflow: 'hidden',
-    ...Shadows.sm,
+    ...Shadows.md,
   },
   cardFlex: {
     flex: 1,
   },
   imageContainer: {
-    position: 'relative',
-  imageContainer: {
+    width: '100%',
     position: 'relative',
     backgroundColor: Colors.backgroundSecondary,
   },
+  image: {
+    width: '100%',
+    height: '100%',
+  },
   imagePlaceholder: {
+    width: '100%',
+    height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: Colors.backgroundSecondary,
   },
   badgeRow: {
     position: 'absolute',
@@ -161,8 +153,10 @@ const styles = StyleSheet.create({
   favoriteBtn: {
     position: 'absolute',
     top: Spacing[2],
-    width: 32,
-    height: 32,
+  },
+  favoriteGlow: {
+    width: 30,
+    height: 30,
     borderRadius: Radius.full,
     backgroundColor: Colors.glassmorphism,
     alignItems: 'center',
@@ -170,7 +164,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.3)',
   },
-  favoriteGlow: {
   favoriteBtnLTR: { right: Spacing[2] },
   favoriteBtnRTL: { left: Spacing[2] },
   content: {
@@ -182,7 +175,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.base,
     color: Colors.textPrimary,
     textAlign: 'center',
-    marginBottom: Spacing[2],
     lineHeight: 18,
     minHeight: 36,
   },
@@ -200,21 +192,6 @@ const styles = StyleSheet.create({
     color: Colors.rating,
     marginLeft: 2,
   },
-  prepBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-    backgroundColor: Colors.backgroundSecondary,
-    paddingHorizontal: Spacing[1.5],
-    paddingVertical: Spacing[0.5],
-    borderRadius: Radius.sm,
-  },
-  prepText: {
-    fontFamily: FontFamily.medium,
-    fontSize: FontSize.xs,
-    color: Colors.textMuted,
-  },
-  nameRTL: { textAlign: 'right' },
   footer: {
     flexDirection: 'row',
     alignItems: 'center',

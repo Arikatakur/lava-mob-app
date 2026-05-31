@@ -21,7 +21,7 @@ export function CategoryChip({ label, isSelected, onPress, iconName }: CategoryC
         <View style={[styles.iconWrap, isSelected && styles.iconWrapSelected]}>
           <MaterialIcons
             name={iconName as keyof typeof MaterialIcons.glyphMap}
-            size={18}
+            size={16}
             color={isSelected ? Colors.white : Colors.primaryBrown}
           />
         </View>
@@ -41,25 +41,21 @@ const styles = StyleSheet.create({
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'center',
-    paddingHorizontal: Spacing[4],
-    height: 44,
-    justifyContent: 'center',
+    paddingHorizontal: Spacing[3],
+    height: 40,
     borderRadius: Radius['2xl'],
     backgroundColor: Colors.surface,
     borderWidth: 1,
     borderColor: Colors.border,
     gap: Spacing[1.5],
-    ...Shadows.xs,
   },
   chipSelected: {
     backgroundColor: Colors.primaryBrown,
     borderColor: Colors.primaryBrown,
-    ...Shadows.sm,
   },
   iconWrap: {
-    width: 26,
-    height: 26,
+    width: 24,
+    height: 24,
     borderRadius: Radius.full,
     backgroundColor: Colors.warmBeige,
     alignItems: 'center',
@@ -70,7 +66,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: FontFamily.semiBold,
-    fontSize: FontSize.base,
+    fontSize: FontSize.sm,
     color: Colors.textSecondary,
   },
   labelSelected: {

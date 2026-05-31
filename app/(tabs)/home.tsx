@@ -27,9 +27,8 @@ import { useAuthStore } from '../../src/store/useAuthStore';
 import { Colors, FontFamily, FontSize, Spacing, Radius, Shadows, Layout } from '../../src/theme';
 import type { Product } from '../../src/types';
 
-const CARD_GAP = Layout.cardGap;            // 12
-const SCREEN_PAD = Layout.screenPaddingHorizontal; // 16
-const CAROUSEL_PEEK = 40;                   // px of third card visible — intentional, not awkward
+const CARD_GAP = Layout.cardGap;
+const SCREEN_PAD = Layout.screenPaddingHorizontal;
 
 function getTierLabel(points: number, t: ReturnType<typeof useTranslation>['t']) {
   if (points >= 1000) return t.rewards.gold;
@@ -124,15 +123,12 @@ export default function Home() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  const carouselCardWidth = Math.floor((screenW - SCREEN_PAD * 2 - CARD_GAP - CAROUSEL_PEEK) / 2);
+  const carouselCardWidth = Math.floor((screenW - SCREEN_PAD * 2 - CARD_GAP) / 2);
 
   const { banners, loading: bannersLoading } = useBanners(refreshKey);
   const { categories } = useCategories(refreshKey);
   const { products: featured, loading: featuredLoading } = useFeaturedProducts(refreshKey);
   const { products: menuProducts, loading: menuLoading } = useProducts(selectedCategory !== 'all' ? selectedCategory : undefined, refreshKey);
-
-  const greetingName = profile?.full_name?.split(' ')[0] ?? '';
-  const currentCategory = [...categories].find((c) => c.slug === selectedCategory) ?? { id: 'all', name_en: 'All', name_he: 'الكل', slug: 'all', sort_order: 0, is_active: true };
 
   useEffect(() => {
     if (!refreshing) return;
@@ -145,11 +141,6 @@ export default function Home() {
     setRefreshing(true);
     setRefreshKey((prev) => prev + 1);
   };
-
-  const firstName = profile?.full_name?.split(' ')[0];
-  const greeting = firstName
-    ? `${t.home.greeting} ${firstName}!`
-    : `${t.home.greeting} 🍫`;
 
   const handleAddToCart = (product: Product) => {
     addItem(product, 1, []);
@@ -269,7 +260,7 @@ export default function Home() {
           />
         </View>
 
-        {/* Promo Banner */}
+        {/* Promotional Banner */}
         <View style={styles.promoBanner}>
           <View style={styles.promoContent}>
             <Text style={styles.promoEmoji}>🍫</Text>
@@ -362,7 +353,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: Spacing[6],
+    paddingHorizontal: Spacing[5],
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
     paddingBottom: Spacing[4],
   },
@@ -383,7 +374,7 @@ const styles = StyleSheet.create({
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing[4],
+    gap: Spacing[3],
   },
   headerText: {
     alignItems: 'flex-end',
@@ -415,10 +406,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.white,
-    marginHorizontal: Spacing[6],
-    paddingHorizontal: Spacing[5],
-    height: 54,
-    borderRadius: 27,
+    marginHorizontal: Spacing[5],
+    paddingHorizontal: Spacing[4],
+    height: 52,
+    borderRadius: 26,
     gap: Spacing[3],
     ...Shadows.md,
   },
@@ -430,27 +421,27 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   loyaltySection: {
-    paddingHorizontal: Spacing[6],
+    paddingHorizontal: Spacing[5],
     marginTop: Spacing[5],
   },
   bannersContainer: {
-    paddingHorizontal: Spacing[6],
+    paddingHorizontal: Spacing[5],
     marginTop: Spacing[5],
     gap: Spacing[4],
   },
   sectionGap: {
-    marginTop: Spacing[7],
+    marginTop: Spacing[6],
   },
   sectionLabel: {
     fontSize: 15,
     color: Colors.textMuted,
     fontFamily: FontFamily.regular,
-    paddingHorizontal: Spacing[6],
+    paddingHorizontal: Spacing[5],
     marginBottom: Spacing[3],
     textAlign: 'right',
   },
   categoriesList: {
-    paddingHorizontal: Spacing[6],
+    paddingHorizontal: Spacing[5],
     gap: Spacing[4],
   },
   promoBanner: {
@@ -458,7 +449,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: Colors.primaryBrown,
-    marginHorizontal: Spacing[6],
+    marginHorizontal: Spacing[5],
     marginTop: Spacing[6],
     paddingVertical: Spacing[4],
     paddingHorizontal: Spacing[5],
@@ -501,7 +492,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing[2],
-    paddingHorizontal: Spacing[6],
+    paddingHorizontal: Spacing[5],
     marginBottom: Spacing[3],
   },
   sectionTitle: {
@@ -518,9 +509,9 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.regular,
   },
   productsList: {
-    paddingHorizontal: Spacing[6],
+    paddingHorizontal: Spacing[5],
     gap: Spacing[4],
-    paddingRight: Spacing[6],
+    paddingRight: Spacing[5],
   },
   mostOrderedWrap: {
     marginTop: Spacing[6],
@@ -535,7 +526,7 @@ const styles = StyleSheet.create({
   emptyResults: {
     alignItems: 'center',
     paddingVertical: Spacing[10],
-    paddingHorizontal: Spacing[6],
+    paddingHorizontal: Spacing[5],
   },
   emptyTitle: {
     fontSize: 18,
@@ -588,6 +579,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   rtl: { flexDirection: 'row-reverse' },
+  alignRight: { textAlign: 'right' },
   loyaltyLeft: {
     gap: Spacing[1],
   },
@@ -654,39 +646,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     maxWidth: 60,
   },
-  heroBanner: {
-    marginHorizontal: SCREEN_PAD,
-    height: 180,
-    borderRadius: Radius.xl,
-    backgroundColor: Colors.darkEspresso,
-    overflow: 'hidden',
-    marginBottom: Spacing[4],
-    justifyContent: 'flex-end',
-  },
-  heroContent: { padding: Spacing[5] },
-  heroTag: {
-    fontFamily: FontFamily.medium,
-    fontSize: FontSize.xs,
-    color: 'rgba(255,255,255,0.6)',
-  },
-  heroTitle: {
-    fontFamily: FontFamily.bold,
-    fontSize: FontSize['3xl'],
-    color: Colors.white,
-    lineHeight: 36,
-    marginBottom: Spacing[4],
-  },
-  heroBtn: {
-    alignSelf: 'flex-start',
-    backgroundColor: Colors.accentCaramel,
-    paddingHorizontal: Spacing[5],
-    paddingVertical: Spacing[2],
-    borderRadius: Radius.full,
-  },
-  heroBtnText: {
-    fontFamily: FontFamily.semiBold,
-    fontSize: FontSize.sm,
-    color: Colors.white,
-  },
-  bottomPad: { marginBottom: Spacing[8] },
 });

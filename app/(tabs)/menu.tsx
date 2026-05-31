@@ -24,8 +24,8 @@ import { useFavoritesStore } from '../../src/store/useFavoritesStore';
 import { Colors, FontFamily, FontSize, Radius, Spacing, Shadows, Layout } from '../../src/theme';
 import type { Product } from '../../src/types';
 
-const SCREEN_PAD = Layout.screenPaddingHorizontal; // 16
-const CARD_GAP = Layout.cardGap;                   // 12
+const SCREEN_PAD = Layout.screenPaddingHorizontal;
+const CARD_GAP = Layout.cardGap;
 
 export default function Menu() {
   const { t, isRTL } = useTranslation();
@@ -45,9 +45,7 @@ export default function Menu() {
   const { categories } = useCategories();
   const { products, loading } = useProducts(selectedCategory !== 'all' ? selectedCategory : undefined);
 
-  // Compute equal-width grid cells: 2 columns, 16px outer + 12px center gap
   const gridCardWidth = Math.floor((screenW - SCREEN_PAD * 2 - CARD_GAP) / 2);
-
 
   const allCategories = [
     { id: 'all', name_en: t.common.all, name_he: t.common.all, name_ar: t.common.all, slug: 'all', sort_order: 0, is_active: true },
@@ -106,7 +104,7 @@ export default function Menu() {
       {/* Header */}
       <View style={styles.topBar}>
         <View style={styles.headerRight}>
-          <Text style={[styles.title, isRTL && styles.rtlText]}>
+          <Text style={styles.title}>
             {isSearching ? t.search.title : t.menu.title}
           </Text>
         </View>
@@ -156,7 +154,7 @@ export default function Menu() {
         )}
       />
 
-      {/* Promo Banner */}
+      {/* Promotional Banner */}
       <View style={styles.promoBanner}>
         <View style={styles.promoContent}>
           <Text style={styles.promoEmoji}>🧁</Text>
@@ -227,7 +225,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: Spacing[6],
+    paddingHorizontal: Spacing[5],
     paddingTop: Spacing[4],
     paddingBottom: Spacing[3],
   },
@@ -240,13 +238,12 @@ const styles = StyleSheet.create({
     color: Colors.primaryBrown,
     textAlign: 'right',
   },
-  alignRight: { textAlign: 'right' },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.white,
-    marginHorizontal: Spacing[6],
-    paddingHorizontal: Spacing[5],
+    marginHorizontal: Spacing[5],
+    paddingHorizontal: Spacing[4],
     height: 52,
     borderRadius: 26,
     gap: Spacing[3],
@@ -265,7 +262,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: Colors.textMuted,
     fontFamily: FontFamily.regular,
-    paddingHorizontal: Spacing[6],
+    paddingHorizontal: Spacing[5],
     marginBottom: Spacing[3],
     textAlign: 'right',
   },
@@ -274,16 +271,16 @@ const styles = StyleSheet.create({
     marginBottom: Spacing[2],
   },
   categoriesList: {
-    paddingHorizontal: Spacing[6],
+    paddingHorizontal: Spacing[5],
     gap: Spacing[4],
-    paddingRight: Spacing[6],
+    paddingRight: Spacing[5],
   },
   promoBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: Colors.primaryBrown,
-    marginHorizontal: Spacing[6],
+    marginHorizontal: Spacing[5],
     marginTop: Spacing[4],
     marginBottom: Spacing[5],
     paddingVertical: Spacing[4],
@@ -324,15 +321,12 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.semiBold,
   },
   grid: {
-    paddingHorizontal: Spacing[6],
+    paddingHorizontal: Spacing[5],
     paddingBottom: Spacing[24],
     gap: Spacing[3],
   },
   row: {
     justifyContent: 'space-between',
-  },
-  cardWrapper: {
-    alignItems: 'center',
   },
   productsContainer: {
     flex: 1,
