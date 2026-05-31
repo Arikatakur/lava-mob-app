@@ -9,7 +9,7 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { QuantityStepper } from '../ui/QuantityStepper';
 import { Colors, FontFamily, FontSize, Radius, Spacing, Shadows } from '../../theme';
-import type { Product, SelectedOption } from '../../types';
+import type { Language, Product, SelectedOption } from '../../types';
 
 interface CartItemCardProps {
   id: string;
@@ -18,7 +18,7 @@ interface CartItemCardProps {
   quantity: number;
   unitPrice: number;
   options: SelectedOption[];
-  language: 'he' | 'en';
+  language: Language;
   isRTL?: boolean;
   onIncrement: () => void;
   onDecrement: () => void;
@@ -37,8 +37,14 @@ export function CartItemCard({
   onDecrement,
   onRemove,
 }: CartItemCardProps) {
-  const optionLabel = (o: SelectedOption) =>
-    language === 'he' ? o.name_he : o.name_en;
+  const optionLabel = (o: SelectedOption) => {
+    if (language === 'he') return o.name_he;
+    // SelectedOption is sourced from product_options; the AR column may not yet
+    // be populated for every option, so fall back to EN when missing.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (language === 'ar') return (o as any).name_ar ?? o.name_en;
+    return o.name_en;
+  };
 
   return (
     <View style={[styles.card, isRTL && styles.rtl]}>

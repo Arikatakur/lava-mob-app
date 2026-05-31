@@ -24,8 +24,13 @@ export function CategoryChip({ label, isSelected, onPress }: CategoryChipProps) 
 
 const styles = StyleSheet.create({
   chip: {
+    // Lock chip height + alignment so the row doesn't stretch its items vertically
+    // when the FlatList sits above a short results list (FlatList horizontal items
+    // otherwise inherit the parent's cross-axis stretch on iOS).
+    alignSelf: 'center',
+    height: 38,
     paddingHorizontal: Spacing[4],
-    paddingVertical: Spacing[2],
+    justifyContent: 'center',
     borderRadius: Radius.full,
     backgroundColor: Colors.surface,
     borderWidth: 1.5,

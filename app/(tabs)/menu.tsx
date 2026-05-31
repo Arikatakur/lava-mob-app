@@ -6,6 +6,7 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
+  useWindowDimensions,
 } from 'react-native';
 import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -20,14 +21,18 @@ import { useCategories, useProducts } from '../../src/hooks/useProducts';
 import { productsService } from '../../src/services/products.service';
 import { useCartStore } from '../../src/store/useCartStore';
 import { useFavoritesStore } from '../../src/store/useFavoritesStore';
-import { Colors, FontFamily, FontSize, Radius, Spacing } from '../../src/theme';
+import { Colors, FontFamily, FontSize, Radius, Spacing, Layout } from '../../src/theme';
 import type { Product } from '../../src/types';
+
+const SCREEN_PAD = Layout.screenPaddingHorizontal; // 16
+const CARD_GAP = Layout.cardGap;                   // 12
 
 export default function Menu() {
   const { t, isRTL } = useTranslation();
   const { localize } = useLocalizedText();
   const { addItem } = useCartStore();
   const { isFavorite, toggle } = useFavoritesStore();
+  const { width: screenW } = useWindowDimensions();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -37,8 +42,11 @@ export default function Menu() {
   const { categories } = useCategories();
   const { products, loading } = useProducts(selectedCategory !== 'all' ? selectedCategory : undefined);
 
+  // Compute equal-width grid cells: 2 columns, 16px outer + 12px center gap
+  const gridCardWidth = Math.floor((screenW - SCREEN_PAD * 2 - CARD_GAP) / 2);
+
   const allCategories = [
-    { id: 'all', name_en: 'All', name_he: 'הכל', slug: 'all', sort_order: 0, is_active: true },
+    { id: 'all', name_en: t.common.all, name_he: t.common.all, name_ar: t.common.all, slug: 'all', sort_order: 0, is_active: true },
     ...categories,
   ];
 
@@ -66,7 +74,7 @@ export default function Menu() {
     <ScreenWrapper>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={[styles.title, isRTL && styles.rtlText]}>
+        <Text style={[styles.title, isRTL && styles.alignRight]}>
           {isSearching ? t.search.title : t.menu.title}
         </Text>
       </View>
@@ -75,7 +83,7 @@ export default function Menu() {
       <View style={[styles.searchBar, isRTL && styles.rtl]}>
         <MaterialIcons name="search" size={20} color={Colors.textSecondary} />
         <TextInput
-          style={[styles.searchInput, isRTL && styles.rtlInput]}
+          style={[styles.searchInput, isRTL && styles.alignRight]}
           placeholder={t.home.searchPlaceholder}
           placeholderTextColor={Colors.textMuted}
           value={searchQuery}
@@ -98,6 +106,7 @@ export default function Menu() {
           keyExtractor={(c) => c.id}
           contentContainerStyle={styles.categoriesList}
           style={styles.categoriesRow}
+          ItemSeparatorComponent={() => <View style={{ width: Spacing[2] }} />}
           renderItem={({ item }) => (
             <CategoryChip
               label={localize(item, 'name')}
@@ -116,7 +125,7 @@ export default function Menu() {
           keyExtractor={(i) => String(i)}
           contentContainerStyle={styles.grid}
           columnWrapperStyle={styles.row}
-          renderItem={() => <ProductCardSkeleton />}
+          renderItem={() => <ProductCardSkeleton width={gridCardWidth} />}
         />
       ) : displayedProducts.length === 0 ? (
         <EmptyState
@@ -133,16 +142,15 @@ export default function Menu() {
           columnWrapperStyle={styles.row}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
-            <View style={styles.cardWrapper}>
-              <ProductCard
-                product={item}
-                localizedName={localize(item, 'name')}
-                onPress={() => router.push(`/product/${item.id}`)}
-                onAddToCart={() => addItem(item, 1, [])}
-                isFavorite={isFavorite(item.id)}
-                onToggleFavorite={() => toggle(item.id)}
-              />
-            </View>
+            <ProductCard
+              product={item}
+              localizedName={localize(item, 'name')}
+              onPress={() => router.push(`/product/${item.id}`)}
+              onAddToCart={() => addItem(item, 1, [])}
+              isFavorite={isFavorite(item.id)}
+              onToggleFavorite={() => toggle(item.id)}
+              width={gridCardWidth}
+            />
           )}
         />
       )}
@@ -152,7 +160,7 @@ export default function Menu() {
 
 const styles = StyleSheet.create({
   header: {
-    paddingHorizontal: Spacing[5],
+    paddingHorizontal: SCREEN_PAD,
     paddingTop: Spacing[4],
     paddingBottom: Spacing[3],
   },
@@ -161,13 +169,13 @@ const styles = StyleSheet.create({
     fontSize: FontSize['3xl'],
     color: Colors.textPrimary,
   },
-  rtlText: { textAlign: 'right' },
+  alignRight: { textAlign: 'right' },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.surface,
     borderRadius: Radius.md,
-    marginHorizontal: Spacing[5],
+    marginHorizontal: SCREEN_PAD,
     paddingHorizontal: Spacing[4],
     paddingVertical: Spacing[2.5],
     borderWidth: 1,
@@ -182,22 +190,18 @@ const styles = StyleSheet.create({
     fontSize: FontSize.base,
     color: Colors.textPrimary,
   },
-  rtlInput: { textAlign: 'right' },
   categoriesRow: {
     marginBottom: Spacing[4],
   },
   categoriesList: {
-    paddingHorizontal: Spacing[5],
+    paddingHorizontal: SCREEN_PAD,
   },
   grid: {
-    paddingHorizontal: Spacing[4],
+    paddingHorizontal: SCREEN_PAD,
     paddingBottom: Spacing[10],
+    gap: CARD_GAP,
   },
   row: {
-    justifyContent: 'space-between',
-    marginBottom: Spacing[3],
-  },
-  cardWrapper: {
-    width: '48%',
+    gap: CARD_GAP,
   },
 });

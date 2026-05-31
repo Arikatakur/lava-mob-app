@@ -12,6 +12,7 @@ export const en = {
     done: 'Done',
     search: 'Search',
     seeAll: 'See All',
+    all: 'All',
     add: 'Add',
     remove: 'Remove',
     edit: 'Edit',
