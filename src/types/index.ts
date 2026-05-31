@@ -11,6 +11,7 @@ export interface Category {
   id: string;
   name_en: string;
   name_he: string;
+  name_ar?: string;
   slug: string;
   icon_name?: string;
   image_url?: string;
@@ -24,6 +25,7 @@ export interface ProductOption {
   option_type: 'size' | 'milk' | 'temperature' | 'extra';
   name_en: string;
   name_he: string;
+  name_ar?: string;
   price_delta: number;
   is_default: boolean;
   sort_order: number;
@@ -34,8 +36,10 @@ export interface Product {
   category_id: string | null;
   name_en: string;
   name_he: string;
+  name_ar?: string;
   description_en?: string;
   description_he?: string;
+  description_ar?: string;
   price: number;
   image_url?: string;
   is_featured: boolean;
@@ -111,8 +115,10 @@ export interface Banner {
   id: string;
   title_en: string;
   title_he: string;
+  title_ar?: string;
   subtitle_en?: string;
   subtitle_he?: string;
+  subtitle_ar?: string;
   image_url?: string;
   action_type: 'product' | 'category' | 'url';
   action_ref?: string;

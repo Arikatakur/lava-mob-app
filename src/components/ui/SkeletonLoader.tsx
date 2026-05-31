@@ -36,10 +36,12 @@ export function Skeleton({ width = '100%', height, borderRadius = Radius.sm, sty
   );
 }
 
-export function ProductCardSkeleton() {
+export function ProductCardSkeleton({ width }: { width?: number }) {
+  // When width is provided keep image as a square to match ProductCard aspect ratio
+  const imageHeight = width ?? 140;
   return (
-    <View style={styles.cardSkeleton}>
-      <Skeleton height={140} borderRadius={Radius.md} style={styles.imageSkeleton} />
+    <View style={[styles.cardSkeleton, width !== undefined && { width }]}>
+      <Skeleton height={imageHeight} borderRadius={12} style={styles.imageSkeleton} />
       <View style={styles.textSkeletons}>
         <Skeleton height={14} width="70%" />
         <Skeleton height={12} width="50%" style={{ marginTop: 6 }} />
@@ -58,11 +60,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.skeletonBase,
   },
   cardSkeleton: {
-    width: 160,
     backgroundColor: Colors.surface,
     borderRadius: Radius.lg,
     overflow: 'hidden',
-    marginRight: Spacing[3],
+
   },
   imageSkeleton: {
     width: '100%',

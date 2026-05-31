@@ -9,6 +9,7 @@ import {
   RefreshControl,
   Image,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -23,8 +24,12 @@ import { useFeaturedProducts, useCategories, useBanners, useProducts } from '../
 import { useCartStore } from '../../src/store/useCartStore';
 import { useFavoritesStore } from '../../src/store/useFavoritesStore';
 import { useAuthStore } from '../../src/store/useAuthStore';
-import { Colors, FontFamily, FontSize, Spacing, Radius, Shadows } from '../../src/theme';
+import { Colors, FontFamily, FontSize, Spacing, Radius, Shadows, Layout } from '../../src/theme';
 import type { Product } from '../../src/types';
+
+const CARD_GAP = Layout.cardGap;            // 12
+const SCREEN_PAD = Layout.screenPaddingHorizontal; // 16
+const CAROUSEL_PEEK = 40;                   // px of third card visible — intentional, not awkward
 
 function getTierLabel(points: number, t: ReturnType<typeof useTranslation>['t']) {
   if (points >= 1000) return t.rewards.gold;
@@ -65,8 +70,12 @@ function LoyaltyCard({ points, isRTL, t }: {
             <MaterialIcons name="star" size={12} color={tierColor} />
             <Text style={[styles.loyaltyTierText, { color: tierColor }]}>{tier}</Text>
           </View>
-          <Text style={styles.loyaltyPoints}>{points.toLocaleString()}</Text>
-          <Text style={styles.loyaltyPointsLabel}>{t.home.yourPoints}</Text>
+          <Text style={[styles.loyaltyPoints, isRTL && styles.alignRight]}>
+            {points.toLocaleString()}
+          </Text>
+          <Text style={[styles.loyaltyPointsLabel, isRTL && styles.alignRight]}>
+            {t.home.yourPoints}
+          </Text>
           {nextLabel && nextPts && (
             <View style={styles.loyaltyProgressWrap}>
               <View style={styles.loyaltyProgressBar}>
@@ -75,7 +84,7 @@ function LoyaltyCard({ points, isRTL, t }: {
                   backgroundColor: tierColor,
                 }]} />
               </View>
-              <Text style={styles.loyaltyProgressLabel}>
+              <Text style={[styles.loyaltyProgressLabel, isRTL && styles.alignRight]}>
                 {nextPts - points} {t.profile.ptsTo} {nextLabel}
               </Text>
             </View>
@@ -110,9 +119,12 @@ export default function Home() {
   const { profile, user } = useAuthStore();
   const { addItem } = useCartStore();
   const { isFavorite, toggle } = useFavoritesStore();
+  const { width: screenW } = useWindowDimensions();
   const [refreshing, setRefreshing] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState('all');
+
+  const carouselCardWidth = Math.floor((screenW - SCREEN_PAD * 2 - CARD_GAP - CAROUSEL_PEEK) / 2);
 
   const { banners, loading: bannersLoading } = useBanners(refreshKey);
   const { categories } = useCategories(refreshKey);
@@ -120,7 +132,7 @@ export default function Home() {
   const { products: menuProducts, loading: menuLoading } = useProducts(selectedCategory !== 'all' ? selectedCategory : undefined, refreshKey);
 
   const greetingName = profile?.full_name?.split(' ')[0] ?? '';
-  const currentCategory = [...categories].find((c) => c.slug === selectedCategory) ?? { id: 'all', name_en: 'All', name_he: 'הכל', slug: 'all', sort_order: 0, is_active: true };
+  const currentCategory = [...categories].find((c) => c.slug === selectedCategory) ?? { id: 'all', name_en: 'All', name_he: 'الكل', slug: 'all', sort_order: 0, is_active: true };
 
   useEffect(() => {
     if (!refreshing) return;
@@ -134,6 +146,11 @@ export default function Home() {
     setRefreshKey((prev) => prev + 1);
   };
 
+  const firstName = profile?.full_name?.split(' ')[0];
+  const greeting = firstName
+    ? `${t.home.greeting} ${firstName}!`
+    : `${t.home.greeting} 🍫`;
+
   const handleAddToCart = (product: Product) => {
     addItem(product, 1, []);
   };
@@ -143,9 +160,21 @@ export default function Home() {
   };
 
   const allCategories = [
-    { id: 'all', name_en: 'All', name_he: 'الكل', slug: 'all', sort_order: 0, is_active: true, icon_name: 'grid-view' },
+    { id: 'all', name_en: t.common.all, name_he: t.common.all, name_ar: t.common.all, slug: 'all', sort_order: 0, is_active: true, icon_name: 'grid-view' },
     ...categories,
   ];
+
+  const renderCarouselCard = ({ item }: { item: Product }) => (
+    <ProductCard
+      product={item}
+      localizedName={localize(item, 'name')}
+      onPress={() => router.push(`/product/${item.id}`)}
+      onAddToCart={() => handleAddToCart(item)}
+      isFavorite={isFavorite(item.id)}
+      onToggleFavorite={() => toggle(item.id)}
+      width={carouselCardWidth}
+    />
+  );
 
   return (
     <ScreenWrapper>
@@ -228,6 +257,7 @@ export default function Home() {
             showsHorizontalScrollIndicator={false}
             keyExtractor={(c) => c.id}
             contentContainerStyle={styles.categoriesList}
+            ItemSeparatorComponent={() => <View style={{ width: Spacing[2] }} />}
             renderItem={({ item }) => (
               <CategoryChip
                 label={localize(item, 'name')}
@@ -269,7 +299,8 @@ export default function Home() {
               showsHorizontalScrollIndicator={false}
               keyExtractor={(i) => String(i)}
               contentContainerStyle={styles.productsList}
-              renderItem={() => <ProductCardSkeleton />}
+              ItemSeparatorComponent={() => <View style={{ width: CARD_GAP }} />}
+              renderItem={() => <ProductCardSkeleton width={carouselCardWidth} />}
             />
           ) : (
             <FlatList
@@ -278,16 +309,8 @@ export default function Home() {
               showsHorizontalScrollIndicator={false}
               keyExtractor={(p) => p.id}
               contentContainerStyle={styles.productsList}
-              renderItem={({ item }) => (
-                <ProductCard
-                  product={item}
-                  localizedName={localize(item, 'name')}
-                  onPress={() => router.push(`/product/${item.id}`)}
-                  onAddToCart={() => handleAddToCart(item)}
-                  isFavorite={isFavorite(item.id)}
-                  onToggleFavorite={() => toggle(item.id)}
-                />
-              )}
+              ItemSeparatorComponent={() => <View style={{ width: CARD_GAP }} />}
+                renderItem={renderCarouselCard}
             />
           )}
         </View>
@@ -317,16 +340,8 @@ export default function Home() {
               showsHorizontalScrollIndicator={false}
               keyExtractor={(p) => p.id}
               contentContainerStyle={styles.productsList}
-              renderItem={({ item }) => (
-                <ProductCard
-                  product={item}
-                  localizedName={localize(item, 'name')}
-                  onPress={() => router.push(`/product/${item.id}`)}
-                  onAddToCart={() => handleAddToCart(item)}
-                  isFavorite={isFavorite(item.id)}
-                  onToggleFavorite={() => toggle(item.id)}
-                />
-              )}
+              ItemSeparatorComponent={() => <View style={{ width: CARD_GAP }} />}
+                renderItem={renderCarouselCard}
             />
           )}
         </View>
@@ -634,7 +649,44 @@ const styles = StyleSheet.create({
   },
   loyaltyScanHint: {
     fontFamily: FontFamily.regular,
+    fontSize: 10,
+    color: Colors.warmBeige,
+    textAlign: 'center',
+    maxWidth: 60,
+  },
+  heroBanner: {
+    marginHorizontal: SCREEN_PAD,
+    height: 180,
+    borderRadius: Radius.xl,
+    backgroundColor: Colors.darkEspresso,
+    overflow: 'hidden',
+    marginBottom: Spacing[4],
+    justifyContent: 'flex-end',
+  },
+  heroContent: { padding: Spacing[5] },
+  heroTag: {
+    fontFamily: FontFamily.medium,
     fontSize: FontSize.xs,
     color: 'rgba(255,255,255,0.6)',
   },
+  heroTitle: {
+    fontFamily: FontFamily.bold,
+    fontSize: FontSize['3xl'],
+    color: Colors.white,
+    lineHeight: 36,
+    marginBottom: Spacing[4],
+  },
+  heroBtn: {
+    alignSelf: 'flex-start',
+    backgroundColor: Colors.accentCaramel,
+    paddingHorizontal: Spacing[5],
+    paddingVertical: Spacing[2],
+    borderRadius: Radius.full,
+  },
+  heroBtnText: {
+    fontFamily: FontFamily.semiBold,
+    fontSize: FontSize.sm,
+    color: Colors.white,
+  },
+  bottomPad: { marginBottom: Spacing[8] },
 });

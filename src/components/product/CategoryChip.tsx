@@ -41,8 +41,10 @@ const styles = StyleSheet.create({
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
+    alignSelf: 'center',
     paddingHorizontal: Spacing[4],
     height: 44,
+    justifyContent: 'center',
     borderRadius: Radius['2xl'],
     backgroundColor: Colors.surface,
     borderWidth: 1,

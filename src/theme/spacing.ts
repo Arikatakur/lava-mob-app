@@ -31,11 +31,12 @@ export type SpacingKey = keyof typeof Spacing;
 
 // Semantic spacing aliases
 export const Layout = {
-  screenPaddingHorizontal: Spacing[5],  // 20px
+  screenPaddingHorizontal: Spacing[4],  // 16px
   screenPaddingVertical: Spacing[6],    // 24px
   cardPadding: Spacing[4],              // 16px
   sectionGap: Spacing[8],              // 32px
   itemGap: Spacing[3],                  // 12px
+  cardGap: Spacing[3],                  // 12px gap between cards (grid + carousel)
   iconSize: Spacing[6],                 // 24px
   avatarSize: Spacing[12],             // 48px
   bottomTabHeight: 72,

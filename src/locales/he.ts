@@ -12,6 +12,7 @@ export const he = {
     done: 'סיום',
     search: 'חיפוש',
     seeAll: 'ראה הכל',
+    all: 'הכל',
     add: 'הוסף',
     remove: 'הסר',
     edit: 'עריכה',

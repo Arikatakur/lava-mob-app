@@ -10,6 +10,7 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { Badge } from '../ui/Badge';
 import { Colors, FontFamily, FontSize, Radius, Shadows, Spacing } from '../../theme';
+import { useTranslation } from '../../hooks/useTranslation';
 import type { Product } from '../../types';
 
 interface ProductCardProps {
@@ -20,6 +21,9 @@ interface ProductCardProps {
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
   style?: ViewStyle;
+  /** Explicit pixel width — used by horizontal carousels.
+   *  Omit to fill the parent (used by the menu grid). */
+  width?: number;
 }
 
 function StarRow({ rating }: { rating?: number }) {
@@ -37,6 +41,14 @@ function StarRow({ rating }: { rating?: number }) {
   return <View style={{ flexDirection: 'row', gap: 1 }}>{stars}</View>;
 }
 
+// Square images keep card heights identical regardless of source ratio.
+// We size the image area with explicit pixel width AND height — `aspectRatio: 1`
+// and `width/height: '100%'` both fail in production: RN Web's Image (background-image
+// wrapper) doesn't track an aspect-ratio'd parent height, and iOS native Image
+// with percentage dimensions occasionally renders blank when the parent's pixel
+// width is computed from `width: '100%'` of a flex child.
+const DEFAULT_IMAGE_SIZE = 160;
+
 export function ProductCard({
   product,
   localizedName,
@@ -45,23 +57,31 @@ export function ProductCard({
   isFavorite = false,
   onToggleFavorite,
   style,
+  width,
 }: ProductCardProps) {
+  const { isRTL } = useTranslation();
+  const imageSize = width && width > 0 ? width : DEFAULT_IMAGE_SIZE;
+
   return (
-    <TouchableOpacity style={[styles.card, style]} onPress={onPress} activeOpacity={0.9}>
-      <View style={styles.imageContainer}>
+    <TouchableOpacity
+      style={[styles.card, width !== undefined ? { width } : styles.cardFlex, style]}
+      onPress={onPress}
+      activeOpacity={0.9}
+    >
+      <View style={[styles.imageContainer, { width: imageSize, height: imageSize }]}>
         {product.image_url ? (
           <Image
             source={{ uri: product.image_url }}
-            style={styles.image}
+            style={{ width: imageSize, height: imageSize }}
             resizeMode="cover"
           />
         ) : (
-          <View style={styles.imagePlaceholder}>
+          <View style={[styles.imagePlaceholder, { width: imageSize, height: imageSize }]}>
             <MaterialIcons name="local-cafe" size={40} color={Colors.softMocha} />
           </View>
         )}
 
-        <View style={styles.badgeRow}>
+        <View style={[styles.badgeRow, isRTL ? styles.badgeRowRTL : styles.badgeRowLTR]}>
           {product.is_new && <Badge label="New" variant="new" />}
           {product.tags?.includes('bestseller') && (
             <Badge label="⭐" variant="bestseller" style={{ marginLeft: 4 }} />
@@ -69,7 +89,10 @@ export function ProductCard({
         </View>
 
         {onToggleFavorite && (
-          <TouchableOpacity style={styles.favoriteBtn} onPress={onToggleFavorite}>
+          <TouchableOpacity
+            style={[styles.favoriteBtn, isRTL ? styles.favoriteBtnRTL : styles.favoriteBtnLTR]}
+            onPress={onToggleFavorite}
+          >
             <View style={styles.favoriteGlow}>
               <MaterialIcons
                 name={isFavorite ? 'favorite' : 'favorite-border'}
@@ -82,7 +105,7 @@ export function ProductCard({
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.name} numberOfLines={1}>
+        <Text style={[styles.name, isRTL && styles.nameRTL]} numberOfLines={2}>
           {localizedName}
         </Text>
 
@@ -97,7 +120,7 @@ export function ProductCard({
           ) : null}
         </View>
 
-        <View style={styles.footer}>
+        <View style={[styles.footer, isRTL && styles.footerRTL]}>
           <Text style={styles.price}>₪{product.price.toFixed(0)}</Text>
           <TouchableOpacity style={styles.addButton} onPress={onAddToCart} activeOpacity={0.8}>
             <MaterialIcons name="add" size={20} color={Colors.white} />
@@ -110,40 +133,34 @@ export function ProductCard({
 
 const styles = StyleSheet.create({
   card: {
-    width: 165,
     backgroundColor: Colors.surface,
     borderRadius: Radius.xl,
     overflow: 'hidden',
     ...Shadows.sm,
   },
-  imageContainer: {
-    width: '100%',
-    height: 145,
-    position: 'relative',
+  cardFlex: {
+    flex: 1,
   },
-  image: {
-    width: '100%',
-    height: '100%',
+  imageContainer: {
+    position: 'relative',
+  imageContainer: {
+    position: 'relative',
+    backgroundColor: Colors.backgroundSecondary,
   },
   imagePlaceholder: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: Colors.backgroundSecondary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   badgeRow: {
     position: 'absolute',
     top: Spacing[2],
-    left: Spacing[2],
     flexDirection: 'row',
   },
+  badgeRowLTR: { left: Spacing[2] },
+  badgeRowRTL: { right: Spacing[2] },
   favoriteBtn: {
     position: 'absolute',
     top: Spacing[2],
-    right: Spacing[2],
-  },
-  favoriteGlow: {
     width: 32,
     height: 32,
     borderRadius: Radius.full,
@@ -153,6 +170,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.3)',
   },
+  favoriteGlow: {
+  favoriteBtnLTR: { right: Spacing[2] },
+  favoriteBtnRTL: { left: Spacing[2] },
   content: {
     padding: Spacing[3],
     gap: Spacing[1.5],
@@ -162,7 +182,11 @@ const styles = StyleSheet.create({
     fontSize: FontSize.base,
     color: Colors.textPrimary,
     textAlign: 'center',
+    marginBottom: Spacing[2],
+    lineHeight: 18,
+    minHeight: 36,
   },
+  nameRTL: { textAlign: 'right' },
   ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -190,12 +214,14 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xs,
     color: Colors.textMuted,
   },
+  nameRTL: { textAlign: 'right' },
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: Spacing[1],
   },
+  footerRTL: { flexDirection: 'row-reverse' },
   price: {
     fontFamily: FontFamily.bold,
     fontSize: FontSize.lg,

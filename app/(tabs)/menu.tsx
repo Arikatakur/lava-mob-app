@@ -21,14 +21,18 @@ import { useCategories, useProducts } from '../../src/hooks/useProducts';
 import { productsService } from '../../src/services/products.service';
 import { useCartStore } from '../../src/store/useCartStore';
 import { useFavoritesStore } from '../../src/store/useFavoritesStore';
-import { Colors, FontFamily, FontSize, Radius, Spacing, Shadows } from '../../src/theme';
+import { Colors, FontFamily, FontSize, Radius, Spacing, Shadows, Layout } from '../../src/theme';
 import type { Product } from '../../src/types';
+
+const SCREEN_PAD = Layout.screenPaddingHorizontal; // 16
+const CARD_GAP = Layout.cardGap;                   // 12
 
 export default function Menu() {
   const { t, isRTL } = useTranslation();
   const { localize } = useLocalizedText();
   const { addItem } = useCartStore();
   const { isFavorite, toggle } = useFavoritesStore();
+  const { width: screenW } = useWindowDimensions();
 
   const { category, focus } = useLocalSearchParams<{ category?: string; focus?: string }>();
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,15 +45,12 @@ export default function Menu() {
   const { categories } = useCategories();
   const { products, loading } = useProducts(selectedCategory !== 'all' ? selectedCategory : undefined);
 
-  const { width: screenWidth } = useWindowDimensions();
-  const CARD_GAP = Spacing[3]; // 12
-  const GRID_PADDING = Spacing[5]; // 20
-  const cardWidth = useMemo(
-    () => (screenWidth - GRID_PADDING * 2 - CARD_GAP) / 2,
-    [screenWidth],
-  );
+  // Compute equal-width grid cells: 2 columns, 16px outer + 12px center gap
+  const gridCardWidth = Math.floor((screenW - SCREEN_PAD * 2 - CARD_GAP) / 2);
+
+
   const allCategories = [
-    { id: 'all', name_en: 'All', name_he: 'הכל', slug: 'all', sort_order: 0, is_active: true },
+    { id: 'all', name_en: t.common.all, name_he: t.common.all, name_ar: t.common.all, slug: 'all', sort_order: 0, is_active: true },
     ...categories,
   ];
 
@@ -106,7 +107,7 @@ export default function Menu() {
       <View style={styles.topBar}>
         <View style={styles.headerRight}>
           <Text style={[styles.title, isRTL && styles.rtlText]}>
-            {isSearching ? t.search.title : 'القائمة'}
+            {isSearching ? t.search.title : t.menu.title}
           </Text>
         </View>
       </View>
@@ -142,6 +143,7 @@ export default function Menu() {
         keyExtractor={(c) => c.id}
         contentContainerStyle={styles.categoriesList}
         style={styles.categoriesRow}
+        ItemSeparatorComponent={() => <View style={{ width: Spacing[2] }} />}
         renderItem={({ item }) => (
           <CategoryChip
             label={localize(item, 'name')}
@@ -186,7 +188,7 @@ export default function Menu() {
           keyExtractor={(i) => String(i)}
           contentContainerStyle={styles.grid}
           columnWrapperStyle={styles.row}
-          renderItem={() => <ProductCardSkeleton />}
+          renderItem={() => <ProductCardSkeleton width={gridCardWidth} />}
         />
       ) : displayedProducts.length === 0 ? (
         <EmptyState
@@ -203,17 +205,15 @@ export default function Menu() {
           columnWrapperStyle={styles.row}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
-            <View style={styles.cardWrapper}>
-              <ProductCard
-                product={item}
-                localizedName={localize(item, 'name')}
-                onPress={() => router.push(`/product/${item.id}`)}
-                onAddToCart={() => addItem(item, 1, [])}
-                isFavorite={isFavorite(item.id)}
-                onToggleFavorite={() => toggle(item.id)}
-                style={{ width: cardWidth }}
-              />
-            </View>
+            <ProductCard
+              product={item}
+              localizedName={localize(item, 'name')}
+              onPress={() => router.push(`/product/${item.id}`)}
+              onAddToCart={() => addItem(item, 1, [])}
+              isFavorite={isFavorite(item.id)}
+              onToggleFavorite={() => toggle(item.id)}
+              width={gridCardWidth}
+            />
           )}
         />
       )}
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     color: Colors.primaryBrown,
     textAlign: 'right',
   },
-  rtlText: { textAlign: 'right' },
+  alignRight: { textAlign: 'right' },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',

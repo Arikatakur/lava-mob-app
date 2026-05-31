@@ -19,7 +19,7 @@ import { useLocalizedText } from '../../src/hooks/useLocalizedText';
 import { useAuthStore } from '../../src/store/useAuthStore';
 import { useRewardsStore } from '../../src/store/useRewardsStore';
 import { Colors, FontFamily, FontSize, Radius, Spacing, Shadows } from '../../src/theme';
-import type { Reward, PointTransaction } from '../../src/types';
+import type { Language, Reward, PointTransaction } from '../../src/types';
 
 const TIER_THRESHOLDS = { bronze: 0, silver: 500, gold: 1000 };
 
@@ -167,12 +167,14 @@ function TransactionRow({
   t,
 }: {
   tx: PointTransaction;
-  language: 'he' | 'en';
+  language: Language;
   t: ReturnType<typeof useTranslation>['t'];
 }) {
   const isPositive = tx.points > 0;
-  const desc = language === 'he' ? tx.description_he : tx.description_en;
-  const date = new Date(tx.created_at).toLocaleDateString(language === 'he' ? 'he-IL' : 'en-US', {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const desc = language === 'he' ? tx.description_he : language === 'ar' ? ((tx as any).description_ar ?? tx.description_en) : tx.description_en;
+  const localeTag = language === 'he' ? 'he-IL' : language === 'ar' ? 'ar' : 'en-US';
+  const date = new Date(tx.created_at).toLocaleDateString(localeTag, {
     day: 'numeric',
     month: 'short',
   });
@@ -208,7 +210,7 @@ function RedemptionModal({
   visible: boolean;
   reward: Reward | null;
   onClose: () => void;
-  language: 'he' | 'en';
+  language: Language;
   localize: (obj: Record<string, unknown>, field: string) => string;
   t: ReturnType<typeof useTranslation>['t'];
 }) {

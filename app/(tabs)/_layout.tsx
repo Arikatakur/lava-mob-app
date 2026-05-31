@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCartStore } from '../../src/store/useCartStore';
 import { useTranslation } from '../../src/hooks/useTranslation';
 import { useAuthStore } from '../../src/store/useAuthStore';
@@ -62,18 +63,29 @@ function RewardsTabIcon({ focused }: { focused: boolean }) {
   );
 }
 
+// Suppress unused warning — kept for future use if a rewards tab is added back.
+void RewardsTabIcon;
+
 export default function TabsLayout() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+
+  // Bottom inset already gives us the home-indicator clearance on iPhone X+.
+  // Pair it with a fixed 8px breathing room so labels never crowd the bezel.
+  const bottomPad = Math.max(insets.bottom, Spacing[2]);
+  const tabBarHeight = 60 + bottomPad;
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [styles.tabBar, { height: tabBarHeight, paddingBottom: bottomPad }],
         tabBarActiveTintColor: Colors.primaryBrown,
         tabBarInactiveTintColor: Colors.textMuted,
         tabBarLabelStyle: styles.tabLabel,
         tabBarShowLabel: true,
+        tabBarItemStyle: styles.tabItem,
+        tabBarLabelPosition: 'below-icon',
       }}
     >
       <Tabs.Screen
@@ -142,6 +154,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
     shadowRadius: 24,
+  },
+  tabItem: {
+    paddingTop: Platform.OS === 'ios' ? 2 : 0,
+    gap: 2,
   },
   tabLabel: {
     fontFamily: FontFamily.medium,
