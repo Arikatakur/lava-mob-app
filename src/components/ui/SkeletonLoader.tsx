@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, View, StyleSheet, ViewStyle } from 'react-native';
-import { Colors, Radius } from '../../theme';
+import { Colors, Radius, Spacing } from '../../theme';
 
 interface SkeletonProps {
   width?: number | `${number}%`;
@@ -39,7 +39,7 @@ export function Skeleton({ width = '100%', height, borderRadius = Radius.sm, sty
 export function ProductCardSkeleton() {
   return (
     <View style={styles.cardSkeleton}>
-      <Skeleton height={140} borderRadius={12} style={styles.imageSkeleton} />
+      <Skeleton height={140} borderRadius={Radius.md} style={styles.imageSkeleton} />
       <View style={styles.textSkeletons}>
         <Skeleton height={14} width="70%" />
         <Skeleton height={12} width="50%" style={{ marginTop: 6 }} />
@@ -50,7 +50,7 @@ export function ProductCardSkeleton() {
 }
 
 export function BannerSkeleton() {
-  return <Skeleton height={160} borderRadius={16} style={{ marginHorizontal: 20 }} />;
+  return <Skeleton height={160} borderRadius={Radius.lg} style={{ marginHorizontal: 20 }} />;
 }
 
 const styles = StyleSheet.create({
@@ -60,14 +60,14 @@ const styles = StyleSheet.create({
   cardSkeleton: {
     width: 160,
     backgroundColor: Colors.surface,
-    borderRadius: 14,
+    borderRadius: Radius.lg,
     overflow: 'hidden',
-    marginRight: 12,
+    marginRight: Spacing[3],
   },
   imageSkeleton: {
     width: '100%',
   },
   textSkeletons: {
-    padding: 12,
+    padding: Spacing[3],
   },
 });

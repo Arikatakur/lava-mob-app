@@ -1,35 +1,45 @@
 /**
- * AppLoadingScreen — Sukar Helo branded intro splash.
+ * AppLoadingScreen — Sukar Helo branded intro splash (v2)
  *
- * Visual: warm cream background · dark-chocolate circular badge · cream "S"
+ * Visual: warm cream background · dark-chocolate rounded badge
+ *         · cream words with staggered entry · ambient glow ring
+ *         · light tagline beneath badge
  *
  * Animation sequence
  * ─────────────────────────────────────────────────────────────────
- *  1. Badge:    opacity 0→1 + spring scale 0→1  (slight natural overshoot)
- *  2. Hold:     short pause to let the badge settle            (~300 ms)
- *  3. Wordmark: "SUKAR HELO" fades in + rises 8px→0           (~420 ms)
- *  4. Hold:     give the user a moment to read                 (~700 ms)
- *  5. Exit:     entire screen fades out                        (~480 ms)
- *  → onFinish() is called — layout removes this overlay
+ *  1. Badge:    opacity 0→1 + spring scale 0→1  (natural overshoot)
+ *  2. Settle:   short pause while spring settles          (~100 ms)
+ *  3. SUKAR:    slides up + fades in inside badge         (~180 ms)
+ *  4. HELO:     follows with 80 ms stagger                (~180 ms)
+ *  5. Ring+Tag: glow ring scales in · tagline fades in    (~280 ms)
+ *  6. Pulse:    ring breathes softly (loop, 800 ms/cycle)
+ *  7. Hold:     badge rests                               (~500 ms)
+ *  8. Exit:     screen fades · badge scales to 0.94       (~440 ms)
+ *  → onFinish() is called
  *
- * Total perceived time: ~2.0 s  (intentional, not sluggish)
+ * Total perceived time: ~1.8 s
  */
 
 import React, { useEffect, useRef } from 'react';
 import {
   Animated,
   Dimensions,
+  Easing,
   Platform,
   StyleSheet,
-  Text,
+  View,
 } from 'react-native';
 import { Colors } from '../../theme';
 
 // ── Constants ─────────────────────────────────────────────────────
 const { width } = Dimensions.get('window');
 
-/** Badge diameter — ~28% of screen width, capped at 118 px */
-const BADGE = Math.min(width * 0.28, 118);
+const BADGE_WIDTH  = Math.min(width * 0.7, 280);
+const BADGE_HEIGHT = 80;
+
+const RING_WIDTH  = BADGE_WIDTH  + 36;
+const RING_HEIGHT = BADGE_HEIGHT + 36;
+const RING_RADIUS = 28;
 
 // ── Types ─────────────────────────────────────────────────────────
 interface AppLoadingScreenProps {
@@ -38,20 +48,54 @@ interface AppLoadingScreenProps {
 
 // ── Component ─────────────────────────────────────────────────────
 export function AppLoadingScreen({ onFinish }: AppLoadingScreenProps) {
+
   const screenOpacity = useRef(new Animated.Value(1)).current;
 
+  // Badge
   const badgeOpacity = useRef(new Animated.Value(0)).current;
   const badgeScale   = useRef(new Animated.Value(0.1)).current;
 
-  const wordOpacity    = useRef(new Animated.Value(0)).current;
-  const wordTranslateY = useRef(new Animated.Value(8)).current;
+  // Words — start invisible inside the badge
+  const sukarOpacity    = useRef(new Animated.Value(0)).current;
+  const sukarTranslateY = useRef(new Animated.Value(7)).current;
+  const heloOpacity     = useRef(new Animated.Value(0)).current;
+  const heloTranslateY  = useRef(new Animated.Value(7)).current;
 
+  // Glow ring
+  const ringOpacity    = useRef(new Animated.Value(0)).current;
+  const ringScale      = useRef(new Animated.Value(0.82)).current;
+  const ringPulseScale = useRef(new Animated.Value(1)).current;
+
+  // Tagline
+  const tagOpacity = useRef(new Animated.Value(0)).current;
+
+  // ── Animation ─────────────────────────────────────────────────
   useEffect(() => {
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.timing(ringPulseScale, {
+          toValue: 1.045,
+          duration: 800,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+        Animated.timing(ringPulseScale, {
+          toValue: 1,
+          duration: 800,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+
+    const pulseTimer = setTimeout(() => pulse.start(), 820);
+
     const animation = Animated.sequence([
+      // 1. Badge materialises
       Animated.parallel([
         Animated.timing(badgeOpacity, {
           toValue: 1,
-          duration: 300,
+          duration: 260,
           useNativeDriver: true,
         }),
         Animated.spring(badgeScale, {
@@ -62,43 +106,114 @@ export function AppLoadingScreen({ onFinish }: AppLoadingScreenProps) {
         }),
       ]),
 
-      Animated.delay(300),
+      // 2. Pause while spring settles
+      Animated.delay(100),
 
+      // 3. "SUKAR" slides up
       Animated.parallel([
-        Animated.timing(wordOpacity, {
+        Animated.timing(sukarOpacity, {
           toValue: 1,
-          duration: 420,
+          duration: 180,
           useNativeDriver: true,
         }),
-        Animated.timing(wordTranslateY, {
+        Animated.timing(sukarTranslateY, {
           toValue: 0,
-          duration: 420,
+          duration: 180,
+          easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),
       ]),
 
-      Animated.delay(700),
+      // 4. "HELO" follows with stagger
+      Animated.delay(80),
+      Animated.parallel([
+        Animated.timing(heloOpacity, {
+          toValue: 1,
+          duration: 180,
+          useNativeDriver: true,
+        }),
+        Animated.timing(heloTranslateY, {
+          toValue: 0,
+          duration: 180,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+      ]),
 
-      Animated.timing(screenOpacity, {
-        toValue: 0,
-        duration: 480,
-        useNativeDriver: true,
-      }),
+      // 5. Ring + tagline appear
+      Animated.parallel([
+        Animated.timing(ringOpacity, {
+          toValue: 0.38,
+          duration: 280,
+          useNativeDriver: true,
+        }),
+        Animated.spring(ringScale, {
+          toValue: 1,
+          tension: 60,
+          friction: 8,
+          useNativeDriver: true,
+        }),
+        Animated.timing(tagOpacity, {
+          toValue: 0.55,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]),
+
+      // 6. Hold (ring pulses during this window)
+      Animated.delay(500),
+
+      // 7. Weighted exit
+      Animated.parallel([
+        Animated.timing(screenOpacity, {
+          toValue: 0,
+          duration: 440,
+          easing: Easing.in(Easing.quad),
+          useNativeDriver: true,
+        }),
+        Animated.timing(badgeScale, {
+          toValue: 0.94,
+          duration: 440,
+          easing: Easing.in(Easing.quad),
+          useNativeDriver: true,
+        }),
+      ]),
     ]);
 
     animation.start(({ finished }) => {
-      if (finished) onFinish();
+      if (finished) {
+        pulse.stop();
+        onFinish();
+      }
     });
 
-    return () => animation.stop();
+    return () => {
+      clearTimeout(pulseTimer);
+      pulse.stop();
+      animation.stop();
+    };
   }, []);
 
+  // ── Render ────────────────────────────────────────────────────
   return (
     <Animated.View
       style={[styles.screen, { opacity: screenOpacity }]}
       pointerEvents="none"
     >
-      {/* ── Dark chocolate circular badge ──────────────────────── */}
+      {/* Glow ring — behind the badge */}
+      <Animated.View
+        style={[
+          styles.ring,
+          {
+            opacity: ringOpacity,
+            transform: [
+              { scale: Animated.multiply(ringScale, ringPulseScale) },
+            ],
+          },
+        ]}
+      />
+
+      {/* Dark-chocolate badge */}
       <Animated.View
         style={[
           styles.badge,
@@ -108,23 +223,48 @@ export function AppLoadingScreen({ onFinish }: AppLoadingScreenProps) {
           },
         ]}
       >
-        <Text style={styles.letter} allowFontScaling={false}>
-          S
-        </Text>
+        <View style={styles.wordRow}>
+          <Animated.Text
+            style={[
+              styles.word,
+              {
+                opacity:   sukarOpacity,
+                transform: [{ translateY: sukarTranslateY }],
+              },
+            ]}
+            allowFontScaling={false}
+          >
+            SUKAR
+          </Animated.Text>
+
+          <Animated.Text
+            style={[styles.wordGap, { opacity: sukarOpacity }]}
+            allowFontScaling={false}
+          >
+            {' '}
+          </Animated.Text>
+
+          <Animated.Text
+            style={[
+              styles.word,
+              {
+                opacity:   heloOpacity,
+                transform: [{ translateY: heloTranslateY }],
+              },
+            ]}
+            allowFontScaling={false}
+          >
+            HELO
+          </Animated.Text>
+        </View>
       </Animated.View>
 
-      {/* ── "SUKAR HELO" wordmark ──────────────────────────────── */}
+      {/* Tagline */}
       <Animated.Text
-        style={[
-          styles.wordmark,
-          {
-            opacity:   wordOpacity,
-            transform: [{ translateY: wordTranslateY }],
-          },
-        ]}
+        style={[styles.tagline, { opacity: tagOpacity }]}
         allowFontScaling={false}
       >
-        SUKAR HELO
+        sweet moments, shared
       </Animated.Text>
     </Animated.View>
   );
@@ -134,21 +274,30 @@ export function AppLoadingScreen({ onFinish }: AppLoadingScreenProps) {
 const styles = StyleSheet.create({
   screen: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: Colors.backgroundPrimary,   // warm cream #FDF8F0
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 9999,
+    backgroundColor: Colors.backgroundPrimary,
+    alignItems:      'center',
+    justifyContent:  'center',
+    zIndex:          9999,
     ...Platform.select({ android: { elevation: 99 } }),
   },
 
-  badge: {
-    width:        BADGE,
-    height:       BADGE,
-    borderRadius: BADGE / 2,
-    backgroundColor: Colors.darkEspresso,         // dark chocolate #3D1C02
-    alignItems:    'center',
-    justifyContent: 'center',
+  ring: {
+    position:        'absolute',
+    width:           RING_WIDTH,
+    height:          RING_HEIGHT,
+    borderRadius:    RING_RADIUS,
+    borderWidth:     1,
+    borderColor:     Colors.darkEspresso,
+    backgroundColor: 'transparent',
+  },
 
+  badge: {
+    width:           BADGE_WIDTH,
+    height:          BADGE_HEIGHT,
+    borderRadius:    20,
+    backgroundColor: Colors.darkEspresso,
+    alignItems:      'center',
+    justifyContent:  'center',
     ...Platform.select({
       ios: {
         shadowColor:   '#1A0A00',
@@ -156,27 +305,38 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.22,
         shadowRadius:  22,
       },
-      android: {
-        elevation: 14,
-      },
+      android: { elevation: 14 },
     }),
   },
 
-  letter: {
-    fontFamily: 'Poppins_700Bold',
-    fontSize:   BADGE * 0.52,
-    lineHeight: BADGE * 0.52 * 1.15,
-    color:      Colors.backgroundPrimary,         // cream — matches screen bg
+  wordRow: {
+    flexDirection:  'row',
+    alignItems:     'center',
+    justifyContent: 'center',
+  },
+
+  word: {
+    fontFamily:         'Poppins_700Bold',
+    fontSize:           22,
+    lineHeight:         28,
+    color:              Colors.backgroundPrimary,
     includeFontPadding: false,
     textAlignVertical:  'center',
   },
 
-  wordmark: {
-    marginTop:     BADGE * 0.32,
-    fontFamily:    'Poppins_600SemiBold',
-    fontSize:      11,
-    letterSpacing: 5,
+  wordGap: {
+    fontFamily:         'Poppins_700Bold',
+    fontSize:           22,
+    color:              Colors.backgroundPrimary,
+    includeFontPadding: false,
+  },
+
+  tagline: {
+    marginTop:     14,
+    fontFamily:    'Poppins_400Regular',
+    fontSize:      10,
+    letterSpacing: 3,
     color:         Colors.darkEspresso,
-    opacity:       0,                             // overridden by animation
+    textTransform: 'uppercase',
   },
 });

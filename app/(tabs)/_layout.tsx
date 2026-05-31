@@ -1,30 +1,38 @@
 import { Tabs } from 'expo-router';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useCartStore } from '../../src/store/useCartStore';
 import { useTranslation } from '../../src/hooks/useTranslation';
 import { useAuthStore } from '../../src/store/useAuthStore';
-import { Colors, FontFamily, FontSize, Shadows } from '../../src/theme';
+import { Colors, FontFamily, FontSize, Radius, Shadows, Spacing } from '../../src/theme';
 
 function TabIcon({
   name,
-  color,
   focused,
 }: {
   name: keyof typeof MaterialIcons.glyphMap;
-  color: string;
   focused: boolean;
 }) {
   return (
-    <MaterialIcons name={name} size={focused ? 26 : 24} color={color} />
+    <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
+      <MaterialIcons
+        name={name}
+        size={24}
+        color={focused ? Colors.white : Colors.textMuted}
+      />
+    </View>
   );
 }
 
-function CartTabIcon({ color, focused }: { color: string; focused: boolean }) {
+function CartTabIcon({ focused }: { focused: boolean }) {
   const count = useCartStore((s) => s.getItemCount());
   return (
-    <View>
-      <MaterialIcons name="shopping-bag" size={focused ? 26 : 24} color={color} />
+    <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
+      <MaterialIcons
+        name="shopping-bag"
+        size={24}
+        color={focused ? Colors.white : Colors.textMuted}
+      />
       {count > 0 && (
         <View style={styles.badge}>
           <Text style={styles.badgeText}>{count > 9 ? '9+' : count}</Text>
@@ -34,15 +42,19 @@ function CartTabIcon({ color, focused }: { color: string; focused: boolean }) {
   );
 }
 
-function RewardsTabIcon({ color, focused }: { color: string; focused: boolean }) {
+function RewardsTabIcon({ focused }: { focused: boolean }) {
   const { profile } = useAuthStore();
   const points = profile?.points ?? 0;
 
   return (
-    <View>
-      <MaterialIcons name="card-giftcard" size={focused ? 26 : 24} color={color} />
+    <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
+      <MaterialIcons
+        name="card-giftcard"
+        size={24}
+        color={focused ? Colors.white : Colors.textMuted}
+      />
       {points > 0 && (
-        <View style={[styles.pointsBadge, focused && styles.pointsBadgeFocused]}>
+        <View style={styles.pointsBadge}>
           <Text style={styles.pointsBadgeText}>{points >= 1000 ? '1k+' : points}</Text>
         </View>
       )}
@@ -61,14 +73,15 @@ export default function TabsLayout() {
         tabBarActiveTintColor: Colors.primaryBrown,
         tabBarInactiveTintColor: Colors.textMuted,
         tabBarLabelStyle: styles.tabLabel,
+        tabBarShowLabel: true,
       }}
     >
       <Tabs.Screen
         name="home"
         options={{
           title: t.home.title,
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="home" color={color} focused={focused} />
+          tabBarIcon: ({ focused }) => (
+            <TabIcon name="home" focused={focused} />
           ),
         }}
       />
@@ -76,8 +89,8 @@ export default function TabsLayout() {
         name="menu"
         options={{
           title: t.menu.title,
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="menu-book" color={color} focused={focused} />
+          tabBarIcon: ({ focused }) => (
+            <TabIcon name="menu-book" focused={focused} />
           ),
         }}
       />
@@ -85,8 +98,8 @@ export default function TabsLayout() {
         name="cart"
         options={{
           title: t.cart.tabTitle,
-          tabBarIcon: ({ color, focused }) => (
-            <CartTabIcon color={color} focused={focused} />
+          tabBarIcon: ({ focused }) => (
+            <CartTabIcon focused={focused} />
           ),
         }}
       />
@@ -94,8 +107,8 @@ export default function TabsLayout() {
         name="favorites"
         options={{
           title: t.favorites.title,
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="favorite" color={color} focused={focused} />
+          tabBarIcon: ({ focused }) => (
+            <TabIcon name="favorite" focused={focused} />
           ),
         }}
       />
@@ -103,8 +116,8 @@ export default function TabsLayout() {
         name="profile"
         options={{
           title: t.profile.tabTitle,
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="person" color={color} focused={focused} />
+          tabBarIcon: ({ focused }) => (
+            <TabIcon name="person" focused={focused} />
           ),
         }}
       />
@@ -114,30 +127,49 @@ export default function TabsLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: Colors.surface,
-    borderTopColor: Colors.border,
-    borderTopWidth: 1,
-    height: 72,
-    paddingBottom: 12,
-    paddingTop: 8,
-    ...Shadows.lg,
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 24 : 16,
+    left: 16,
+    right: 16,
+    backgroundColor: Colors.white,
+    borderRadius: Radius['3xl'],
+    height: 68,
+    paddingBottom: 4,
+    paddingTop: 4,
+    borderTopWidth: 0,
+    elevation: 8,
+    shadowColor: '#2C1A0E',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
   },
   tabLabel: {
     fontFamily: FontFamily.medium,
     fontSize: FontSize.xs,
-    marginTop: 2,
+    marginTop: 1,
+  },
+  iconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: Radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconWrapActive: {
+    backgroundColor: Colors.primaryBrown,
+    ...Shadows.float,
   },
   badge: {
     position: 'absolute',
-    top: -4,
-    right: -8,
+    top: -2,
+    right: -4,
     backgroundColor: Colors.error,
-    borderRadius: 10,
+    borderRadius: Radius.full,
     minWidth: 18,
     height: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 3,
+    paddingHorizontal: 4,
   },
   badgeText: {
     fontFamily: FontFamily.bold,
@@ -146,18 +178,15 @@ const styles = StyleSheet.create({
   },
   pointsBadge: {
     position: 'absolute',
-    top: -4,
-    right: -10,
-    backgroundColor: Colors.accentCaramel,
-    borderRadius: 8,
-    minWidth: 22,
+    top: -2,
+    right: -6,
+    backgroundColor: Colors.softGold,
+    borderRadius: Radius.full,
+    minWidth: 20,
     height: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 3,
-  },
-  pointsBadgeFocused: {
-    backgroundColor: Colors.primaryBrown,
+    paddingHorizontal: 4,
   },
   pointsBadgeText: {
     fontFamily: FontFamily.bold,

@@ -22,6 +22,7 @@ export const Spacing = {
   12: 48,
   14: 56,
   16: 64,
+  18: 72,
   20: 80,
   24: 96,
 } as const;

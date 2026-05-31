@@ -4,10 +4,10 @@
  */
 
 export const FontFamily = {
-  regular: 'Poppins_400Regular',
-  medium: 'Poppins_500Medium',
-  semiBold: 'Poppins_600SemiBold',
-  bold: 'Poppins_700Bold',
+  regular: 'IBMPlexSansArabic_400Regular',
+  medium: 'Tajawal_500Medium',
+  semiBold: 'Cairo_600SemiBold',
+  bold: 'Cairo_700Bold',
 } as const;
 
 export const FontSize = {

@@ -1,6 +1,6 @@
 /**
  * Sukar Helo — Shadow System
- * Warm, soft shadows matching the premium chocolate dessert aesthetic.
+ * Soft, elegant shadows for premium dessert aesthetic.
  */
 import { Platform } from 'react-native';
 
@@ -11,9 +11,9 @@ export const Shadows = {
   xs: Platform.select({
     ios: {
       shadowColor,
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.06,
-      shadowRadius: 2,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 4,
     },
     android: { elevation: 1 },
     default: {},
@@ -21,9 +21,9 @@ export const Shadows = {
   sm: Platform.select({
     ios: {
       shadowColor,
-      shadowOffset: { width: 0, height: 2 },
+      shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.08,
-      shadowRadius: 6,
+      shadowRadius: 8,
     },
     android: { elevation: 2 },
     default: {},
@@ -31,9 +31,9 @@ export const Shadows = {
   md: Platform.select({
     ios: {
       shadowColor,
-      shadowOffset: { width: 0, height: 4 },
+      shadowOffset: { width: 0, height: 6 },
       shadowOpacity: 0.10,
-      shadowRadius: 12,
+      shadowRadius: 16,
     },
     android: { elevation: 4 },
     default: {},
@@ -42,8 +42,8 @@ export const Shadows = {
     ios: {
       shadowColor,
       shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.13,
-      shadowRadius: 20,
+      shadowOpacity: 0.12,
+      shadowRadius: 24,
     },
     android: { elevation: 8 },
     default: {},
@@ -52,10 +52,20 @@ export const Shadows = {
     ios: {
       shadowColor,
       shadowOffset: { width: 0, height: 12 },
-      shadowOpacity: 0.16,
-      shadowRadius: 28,
+      shadowOpacity: 0.15,
+      shadowRadius: 32,
     },
     android: { elevation: 12 },
+    default: {},
+  }),
+  float: Platform.select({
+    ios: {
+      shadowColor: '#8B5A3C',
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.20,
+      shadowRadius: 12,
+    },
+    android: { elevation: 6 },
     default: {},
   }),
 } as const;

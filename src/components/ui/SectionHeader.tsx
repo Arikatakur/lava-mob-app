@@ -12,7 +12,7 @@ interface SectionHeaderProps {
 export function SectionHeader({ title, actionLabel, onAction, isRTL = false }: SectionHeaderProps) {
   return (
     <View style={[styles.container, isRTL && styles.rtl]}>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={[styles.title, isRTL && styles.rtlText]}>{title}</Text>
       {actionLabel && onAction && (
         <TouchableOpacity onPress={onAction}>
           <Text style={styles.action}>{actionLabel}</Text>
@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize['2xl'],
     color: Colors.textPrimary,
   },
+  rtlText: { textAlign: 'right' },
   action: {
     fontFamily: FontFamily.medium,
     fontSize: FontSize.base,

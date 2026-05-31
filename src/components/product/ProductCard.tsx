@@ -1,10 +1,11 @@
-import React from 'react';
+﻿import React from 'react';
 import {
   View,
   Text,
   Image,
   TouchableOpacity,
   StyleSheet,
+  ViewStyle,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Badge } from '../ui/Badge';
@@ -18,6 +19,22 @@ interface ProductCardProps {
   onAddToCart: () => void;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
+  style?: ViewStyle;
+}
+
+function StarRow({ rating }: { rating?: number }) {
+  const r = rating ?? 0;
+  const stars = [];
+  for (let i = 1; i <= 5; i++) {
+    if (r >= i) {
+      stars.push(<MaterialIcons key={i} name="star" size={12} color={Colors.rating} />);
+    } else if (r >= i - 0.5) {
+      stars.push(<MaterialIcons key={i} name="star-half" size={12} color={Colors.rating} />);
+    } else {
+      stars.push(<MaterialIcons key={i} name="star-outline" size={12} color={Colors.border} />);
+    }
+  }
+  return <View style={{ flexDirection: 'row', gap: 1 }}>{stars}</View>;
 }
 
 export function ProductCard({
@@ -27,10 +44,10 @@ export function ProductCard({
   onAddToCart,
   isFavorite = false,
   onToggleFavorite,
+  style,
 }: ProductCardProps) {
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
-      {/* Image */}
+    <TouchableOpacity style={[styles.card, style]} onPress={onPress} activeOpacity={0.9}>
       <View style={styles.imageContainer}>
         {product.image_url ? (
           <Image
@@ -40,11 +57,10 @@ export function ProductCard({
           />
         ) : (
           <View style={styles.imagePlaceholder}>
-            <MaterialIcons name="local-cafe" size={36} color={Colors.softMocha} />
+            <MaterialIcons name="local-cafe" size={40} color={Colors.softMocha} />
           </View>
         )}
 
-        {/* Badges */}
         <View style={styles.badgeRow}>
           {product.is_new && <Badge label="New" variant="new" />}
           {product.tags?.includes('bestseller') && (
@@ -52,27 +68,39 @@ export function ProductCard({
           )}
         </View>
 
-        {/* Favorite */}
         {onToggleFavorite && (
           <TouchableOpacity style={styles.favoriteBtn} onPress={onToggleFavorite}>
-            <MaterialIcons
-              name={isFavorite ? 'favorite' : 'favorite-border'}
-              size={20}
-              color={isFavorite ? Colors.error : Colors.white}
-            />
+            <View style={styles.favoriteGlow}>
+              <MaterialIcons
+                name={isFavorite ? 'favorite' : 'favorite-border'}
+                size={18}
+                color={isFavorite ? Colors.error : Colors.white}
+              />
+            </View>
           </TouchableOpacity>
         )}
       </View>
 
-      {/* Content */}
       <View style={styles.content}>
-        <Text style={styles.name} numberOfLines={2}>
+        <Text style={styles.name} numberOfLines={1}>
           {localizedName}
         </Text>
+
+        <View style={styles.ratingRow}>
+          <StarRow rating={product.rating} />
+          <Text style={styles.ratingText}>{product.rating?.toFixed(1) ?? ''}</Text>
+          {product.prep_time_min ? (
+            <View style={styles.prepBadge}>
+              <MaterialIcons name="access-time" size={10} color={Colors.textMuted} />
+              <Text style={styles.prepText}>{product.prep_time_min} د</Text>
+            </View>
+          ) : null}
+        </View>
+
         <View style={styles.footer}>
           <Text style={styles.price}>₪{product.price.toFixed(0)}</Text>
-          <TouchableOpacity style={styles.addButton} onPress={onAddToCart}>
-            <MaterialIcons name="add" size={18} color={Colors.white} />
+          <TouchableOpacity style={styles.addButton} onPress={onAddToCart} activeOpacity={0.8}>
+            <MaterialIcons name="add" size={20} color={Colors.white} />
           </TouchableOpacity>
         </View>
       </View>
@@ -82,18 +110,15 @@ export function ProductCard({
 
 const styles = StyleSheet.create({
   card: {
-    width: 160,
+    width: 165,
     backgroundColor: Colors.surface,
-    borderRadius: Radius.lg,
-    borderWidth: 1,
-    borderColor: Colors.border,
+    borderRadius: Radius.xl,
     overflow: 'hidden',
-    marginHorizontal: Spacing[1.5],
     ...Shadows.sm,
   },
   imageContainer: {
     width: '100%',
-    height: 130,
+    height: 145,
     position: 'relative',
   },
   image: {
@@ -117,39 +142,72 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: Spacing[2],
     right: Spacing[2],
+  },
+  favoriteGlow: {
     width: 32,
     height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.overlayDark,
+    borderRadius: Radius.full,
+    backgroundColor: Colors.glassmorphism,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
   content: {
     padding: Spacing[3],
+    gap: Spacing[1.5],
   },
   name: {
     fontFamily: FontFamily.semiBold,
-    fontSize: FontSize.sm,
+    fontSize: FontSize.base,
     color: Colors.textPrimary,
-    marginBottom: Spacing[2],
-    lineHeight: 18,
+    textAlign: 'center',
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 3,
+    height: 18,
+  },
+  ratingText: {
+    fontFamily: FontFamily.medium,
+    fontSize: FontSize.xs,
+    color: Colors.rating,
+    marginLeft: 2,
+  },
+  prepBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    backgroundColor: Colors.backgroundSecondary,
+    paddingHorizontal: Spacing[1.5],
+    paddingVertical: Spacing[0.5],
+    borderRadius: Radius.sm,
+  },
+  prepText: {
+    fontFamily: FontFamily.medium,
+    fontSize: FontSize.xs,
+    color: Colors.textMuted,
   },
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginTop: Spacing[1],
   },
   price: {
     fontFamily: FontFamily.bold,
-    fontSize: FontSize.base,
+    fontSize: FontSize.lg,
     color: Colors.primaryBrown,
   },
   addButton: {
-    width: 28,
-    height: 28,
+    width: 34,
+    height: 34,
     borderRadius: Radius.full,
     backgroundColor: Colors.primaryBrown,
     alignItems: 'center',
     justifyContent: 'center',
+    ...Shadows.float,
   },
 });

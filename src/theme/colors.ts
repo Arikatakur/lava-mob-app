@@ -1,25 +1,25 @@
 /**
  * Sukar Helo — Centralized Color System
- * Rich chocolate & dessert aesthetic — warm, premium, and indulgent.
- * Do NOT hardcode colors in components — use this file.
+ * Premium dessert shop aesthetic — soft, warm, and luxurious.
  */
 
 export const Colors = {
   // ── Backgrounds ──────────────────────────────────────────
-  backgroundPrimary: '#FDF8F0',      // warm cream canvas
-  backgroundSecondary: '#F5ECD7',    // soft caramel tint
+  backgroundPrimary: '#F8F4EE',      // soft cream canvas
+  backgroundSecondary: '#EFE6DA',    // warm beige tint
 
   // ── Surfaces ─────────────────────────────────────────────
   surface: '#FFFFFF',
   surfaceCard: '#FFFFFF',
 
   // ── Brand Chocolates ─────────────────────────────────────
-  primaryBrown: '#7B4A2D',           // rich milk chocolate (primary brand)
+  primaryBrown: '#8B5A3C',           // chocolate brown (primary brand)
   darkEspresso: '#3D1C02',           // dark chocolate / espresso
   softMocha: '#C8A882',              // warm mocha / latte
 
   // ── Warm Accents ─────────────────────────────────────────
-  warmBeige: '#E8D5B5',              // warm biscuit beige
+  softGold: '#D8B26E',               // soft gold accent
+  warmBeige: '#EFE6DA',              // warm beige
   accentCaramel: '#D4A843',          // gold caramel accent
   mutedGold: '#B8874A',              // warm bronze gold
 
@@ -38,6 +38,7 @@ export const Colors = {
   error: '#B85C4B',
   warning: '#D4A843',
   info: '#7B9DBF',
+  rating: '#D8B26E',                 // gold for stars
 
   // ── Utility ──────────────────────────────────────────────
   white: '#FFFFFF',
@@ -46,7 +47,8 @@ export const Colors = {
 
   // ── Overlays ─────────────────────────────────────────────
   overlayDark: 'rgba(44, 26, 14, 0.65)',
-  overlayLight: 'rgba(253, 248, 240, 0.90)',
+  overlayLight: 'rgba(248, 244, 238, 0.90)',
+  glassmorphism: 'rgba(255, 255, 255, 0.20)',
 
   // ── Skeleton ─────────────────────────────────────────────
   skeletonBase: '#ECD9BC',
