@@ -6,7 +6,7 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 
 ---
 
-## v2.3.0 - 2026-05-25
+## v0.7.0 - 2026-05-25
 
 ### Added — Menu data
 - Arabic localization columns (`name_ar`, `description_ar`, `title_ar`, `subtitle_ar`, etc.) on `products`, `categories`, `product_options`, `product_images`, `banners`, `order_items`, and `rewards`.
@@ -48,7 +48,7 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 
 ---
 
-## v2.3.0 - 2026-05-31
+## v0.6.0 - 2026-05-31
 
 ### Added
 - **Premium dessert-shop redesign** — soft cream background (#F8F4EE), chocolate brown (#8B5A3C), soft gold accents (#D8B26E)
@@ -77,7 +77,7 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 - **Unused variables** — removed `greetingName`, `currentCategory`, `firstName`, `greeting` from home.tsx
 - **Theme imports** — replaced all `Colors.chocolate` → `Colors.primaryBrown`, `Typography.*` → `FontFamily.*`, `Colors.screenBg` → `Colors.backgroundPrimary`
 
-## v2.3.0 - 2026-05-31
+## v0.5.2 - 2026-05-31
 
 ### Added
 - **Premium dessert-shop redesign** — soft cream background (#F8F4EE), chocolate brown (#8B5A3C), soft gold accents (#D8B26E)
@@ -112,9 +112,7 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 - **Missing imports** — added `Platform` and `Shadows` imports to home and menu screens
 - **Logo image** — `require('../../assets/logo.png')` → `require('../../assets/sukar-helo.png')`
 
-## v2.2.3 - 2026-05-31
-
-## v2.2.2 - 2026-05-31
+## v0.5.1 - 2026-05-31
 
 ### Changed
 - **Home screen refresh** — pull-to-refresh now reloads banners, featured products, categories, and menu items.
@@ -122,7 +120,7 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 - **Category browsing** — category chips now switch products locally instead of navigating immediately to the menu screen.
 - **No-results state** — added friendly empty state when filtered category products do not match the search.
 
-## v2.2.1 - 2026-05-31
+## v0.5.0 - 2026-05-31
 
 ### Fixed
 - **CategoryChip** resizing when selected — both states now use the same `fontFamily` so text width stays consistent.
@@ -144,7 +142,7 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
   - **Tab Bar**: floating bottom bar with rounded corners, active tab filled brown circle
   - **Shadows**: softer, more premium `Shadows.float` token
 
-## v2.2.0 - 2026-05-12
+## v0.4.3 - 2026-05-12
 
 ### Changed
 - **Post-login navigation** — after OTP verification (both new and returning users), app navigates to `/order-mode` instead of `/(tabs)/home`.
@@ -159,7 +157,7 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 
 ---
 
-## v2.1.1 - 2026-05-12
+## v0.4.2 - 2026-05-12
 
 ### Changed
 - **Order mode screen** — polished to App Store-level premium UX:
@@ -169,7 +167,7 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
   
 ---
 
-## v2.2.1 - 2026-05-31
+## v0.4.1 - 2026-05-31
 
 ### Fixed
 - `ProductCard` fixed to use a consistent height so menu grid doesn't resize when switching categories.
@@ -181,7 +179,7 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 
 ---
 
-## v2.1.0 - 2026-05-12
+## v0.3.0 - 2026-05-12
 
 ### Added
 - **Arabic language support** — full `src/locales/ar.ts` with complete translations across all screens.
@@ -203,7 +201,7 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 
 ---
 
-## v2.0.0 - 2026-05-12
+## v0.2.0 - 2026-05-12
 
 ### Changed
 - **Complete rebrand** from "Lava Cafe" to "Sukar Helo" across the entire application.
@@ -241,7 +239,7 @@ Format: Semantic versioning — MAJOR.MINOR.PATCH
 
 ---
 
-## v1.0.0 - 2025-01-01
+## v0.1.0 - 2025-01-01
 
 ### Added
 - Initial release of Lava Cafe mobile application.
