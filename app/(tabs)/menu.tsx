@@ -154,20 +154,6 @@ export default function Menu() {
         )}
       />
 
-      {/* Promotional Banner */}
-      <View style={styles.promoBanner}>
-        <View style={styles.promoContent}>
-          <Text style={styles.promoEmoji}>🧁</Text>
-          <View>
-            <Text style={styles.promoTitle}>تشكيلة جديدة</Text>
-            <Text style={styles.promoSubtitle}>جربي كب كيك الفانيليا</Text>
-          </View>
-        </View>
-        <TouchableOpacity style={styles.promoBtn} activeOpacity={0.8}>
-          <Text style={styles.promoBtnText}>استكشاف</Text>
-        </TouchableOpacity>
-      </View>
-
       {/* Products Grid */}
       <View style={styles.productsContainer}>
       {searching ? (
@@ -274,51 +260,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing[5],
     gap: Spacing[4],
     paddingRight: Spacing[5],
-  },
-  promoBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: Colors.primaryBrown,
-    marginHorizontal: Spacing[5],
-    marginTop: Spacing[4],
-    marginBottom: Spacing[5],
-    paddingVertical: Spacing[4],
-    paddingHorizontal: Spacing[5],
-    borderRadius: Radius['3xl'],
-    ...Shadows.lg,
-  },
-  promoContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing[3],
-  },
-  promoEmoji: {
-    fontSize: 32,
-  },
-  promoTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Colors.white,
-    fontFamily: FontFamily.semiBold,
-  },
-  promoSubtitle: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.75)',
-    fontFamily: FontFamily.regular,
-    marginTop: 1,
-  },
-  promoBtn: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingVertical: Spacing[2],
-    paddingHorizontal: Spacing[4],
-    borderRadius: 20,
-  },
-  promoBtnText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.white,
-    fontFamily: FontFamily.semiBold,
   },
   grid: {
     paddingHorizontal: Spacing[5],

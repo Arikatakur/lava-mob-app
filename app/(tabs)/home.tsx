@@ -260,20 +260,6 @@ export default function Home() {
           />
         </View>
 
-        {/* Promotional Banner */}
-        <View style={styles.promoBanner}>
-          <View style={styles.promoContent}>
-            <Text style={styles.promoEmoji}>🍫</Text>
-            <View>
-              <Text style={styles.promoTitle}>خصم 20%</Text>
-              <Text style={styles.promoSubtitle}>على جميع الحلويات اليوم</Text>
-            </View>
-          </View>
-          <TouchableOpacity style={styles.promoBtn} onPress={() => router.push('/(tabs)/menu')}>
-            <Text style={styles.promoBtnText}>تسوق الآن</Text>
-          </TouchableOpacity>
-        </View>
-
         {/* Featured */}
         <View style={styles.sectionGap}>
           <View style={styles.sectionTitleRow}>
@@ -443,50 +429,6 @@ const styles = StyleSheet.create({
   categoriesList: {
     paddingHorizontal: Spacing[5],
     gap: Spacing[4],
-  },
-  promoBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: Colors.primaryBrown,
-    marginHorizontal: Spacing[5],
-    marginTop: Spacing[6],
-    paddingVertical: Spacing[4],
-    paddingHorizontal: Spacing[5],
-    borderRadius: Radius['3xl'],
-    ...Shadows.lg,
-  },
-  promoContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing[3],
-  },
-  promoEmoji: {
-    fontSize: 32,
-  },
-  promoTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Colors.white,
-    fontFamily: FontFamily.semiBold,
-  },
-  promoSubtitle: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.75)',
-    fontFamily: FontFamily.regular,
-    marginTop: 1,
-  },
-  promoBtn: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingVertical: Spacing[2],
-    paddingHorizontal: Spacing[4],
-    borderRadius: 20,
-  },
-  promoBtnText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.white,
-    fontFamily: FontFamily.semiBold,
   },
   sectionTitleRow: {
     flexDirection: 'row',
